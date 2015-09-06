@@ -48,8 +48,6 @@ public abstract class GECreator extends AbstractCreator
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
 	
-	// java.lang.Object methods
-
 	public boolean equals(Object other)
 	{
 		if (other instanceof GECreator){
@@ -59,13 +57,35 @@ public abstract class GECreator extends AbstractCreator
 			return false;
 		}
 	}
+	
+	/**
+	 * Creates a new individual mapping the phenotype too
+	 * 
+	 * @param genotype The individual genotype
+	 * 
+	 * @return the new individual
+	 */
+	
+	public abstract GEIndividual createIndividual(int [] genotype);
 
 	/////////////////////////////////////////////////////////////////
 	// -------------------------------------------- Protected methods
 	/////////////////////////////////////////////////////////////////
 
-	// AbstractCreator methods
-
+	/**
+	 * Create a int [] genotype, filling it randomly
+	 */
+	
+	protected final int [] createGenotype()
+	{
+		int gl = schema.individualArrayGenotype.length;
+		int [] result = new int[gl];
+		for(int i=0; i<gl; i++) {
+			result[i] = schema.individualArrayGenotype[i].getRandom(randgen);
+		}
+		return result;
+	}
+	
 	@Override
 	protected void prepareCreation() 
 	{
@@ -81,24 +101,4 @@ public abstract class GECreator extends AbstractCreator
 		}
 	}
 	
-	public abstract GEIndividual createIndividual(int [] genotype);
-	
-	/////////////////////////////////////////////////////////////////
-	// ---------------------------------------------- Private methods
-	/////////////////////////////////////////////////////////////////
-	
-	/**
-	 * Create a int [] genotype, filling it randomly
-	 */
-	
-	protected final int [] createGenotype()
-	{
-		int gl = schema.individualArrayGenotype.length;
-		int [] result = new int[gl];
-		for(int i=0; i<gl; i++) {
-			result[i] = schema.individualArrayGenotype[i].getRandom(randgen);
-		}
-		return result;
-	}	
-
 }

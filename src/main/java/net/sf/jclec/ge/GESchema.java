@@ -102,7 +102,7 @@ public class GESchema extends SyntaxTreeSchema
 		}
 		else {
 			// Select a production rule
-			NonTerminalNode selectedProduction = selectProduction(symbol, genotype, posGenotype, false);
+			NonTerminalNode selectedProduction = selectProduction(symbol, genotype, posGenotype);
 			// Increment position of genotype going back if it's necessary
 			posGenotype++;
 			if(posGenotype==genotype.length-1)
@@ -127,58 +127,40 @@ public class GESchema extends SyntaxTreeSchema
 	 * @param symbol  Symbol to expand
 	 * @param genotype Genotype of an individual
 	 * @param posGenotype Reading position of the genotype
-	 * @param onlyTerminal A flag which indicates if we must select ony terminal productions or not
+	 * 
+	 * @return A production rule for  the given symbol.
+	 */	
+	
+	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype)
+	{			
+		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
+		// Number of productions
+		int nOfProdRules = prodRules.length;
+		// Choose production based on the genotype
+		int chosen = genotype[posGenotype] % nOfProdRules;
+		// Return production chosen
+		return prodRules[chosen];	
+	}
+	
+	/**
+	 * Select a production rule for a symbol of the grammar.
+	 * 
+	 * @param symbol  Symbol to expand
+	 * @param genotype Genotype of an individual
+	 * @param posGenotype Reading position of the genotype
+	 * @param onlyTerminal If it is true we must choose a production with only terminals and if it is false only non-terminals
 	 * 
 	 * @return A production rule for  the given symbol.
 	 */	
 	
 	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype, boolean onlyTerminal)
-	{	
-		/******************************************************************
-		// Get all productions of this symbol
+	{			
 		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
-		// Number of productions
-		int nOfProdRules = prodRules.length;
-		//Index of the production rule chosen
-		int chosen = -1;
-			
-		// The max number of derivations has been reached
-		if(nOfDer >= getMaxDerivSize()){
-			// Get the min derivation size for the actual symbol
-			int minDerivSize = getMinDerivSize(symbol);
-			// The min derivation size of all the rule productions 
-			int minDerivSizeOfProd;
-			
-			for(int i=0; i<nOfProdRules; i++){
-				minDerivSizeOfProd = 0;
-				for(String prodRule: prodRules[i].getProduction())
-					if(getMinDerivSize(prodRule)>minDerivSizeOfProd)
-						minDerivSizeOfProd = getMinDerivSize(prodRule);
-				if(minDerivSizeOfProd < minDerivSize){
-					chosen = i;
-					break;
-				}
-			}
-		}
-		// The max number of derivations has not been reached yet
-		else{
-			// Choose production based on the genotype
-			chosen = genotype[posGenotype] % nOfProdRules;
-		}
-		// Increment the number of derivations
-		this.nOfDer++;
-		// Return production chosen
-		return prodRules[chosen];
-		*/////////////////////////////////////////////////////////////////////
-		
-		
-		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
+		List <NonTerminalNode> rulesList = new ArrayList<NonTerminalNode>();
 
 		if(onlyTerminal == true)
 		{	
-			List <NonTerminalNode> rulesList = new ArrayList<NonTerminalNode>();
 			boolean nonTerminalFound;
-
 			// Get only the terminal productions
 			for(int i=0; i<prodRules.length; i++)
 			{
@@ -194,14 +176,34 @@ public class GESchema extends SyntaxTreeSchema
 				if(nonTerminalFound == false)
 					rulesList.add(prodRules[i]);
 			}
-			
-			prodRules = rulesList.toArray(new NonTerminalNode [rulesList.size()]);
-			
-			if(prodRules.length == 0)
-				return null;
+		}
+		else
+		{
+			boolean terminalFound;
+			// Get only the non-terminal productions
+			for(int i=0; i<prodRules.length; i++)
+			{
+				terminalFound = false;
+				for(int j=0; j<prodRules[i].getProduction().length; j++)
+				{
+					if(isTerminal(prodRules[i].getProduction()[j]) == true)
+					{
+						terminalFound = true;
+						break;
+					}
+				}
+				if(terminalFound == false)
+					rulesList.add(prodRules[i]);
+			}
 		}
 		
-
+		prodRules = rulesList.toArray(new NonTerminalNode [rulesList.size()]);
+		
+		// We control if there is not any production rule
+		if(prodRules.length == 0)
+			return null;
+		
+		
 		// Number of productions
 		int nOfProdRules = prodRules.length;
 		// Choose production based on the genotype
@@ -273,8 +275,8 @@ public class GESchema extends SyntaxTreeSchema
 		if(posGenotype[0] == 0){	
 			if (isTerminal(symbol) == false) {
 				// Select a production rule for each genotype
-				prod0 = selectProduction(symbol, p0genotype, posGenotype[1], false);
-				prod1 = selectProduction(symbol, p1genotype, posGenotype[1], false);
+				prod0 = selectProduction(symbol, p0genotype, posGenotype[1]);
+				prod1 = selectProduction(symbol, p1genotype, posGenotype[1]);
 				posGenotype[1] = posGenotype[1] + 1;
 				if(prod0.equals(prod1))
 					for(int i=0; i<prod0.getProduction().length; i++)
@@ -296,52 +298,47 @@ public class GESchema extends SyntaxTreeSchema
 	 * @param depth Actual depth of the tree
 	 */
 	
-	/*public int grow(SyntaxTree phenotype, String symbol, int [] genotype, int posGenotype, int depth)
+	public int grow(GEIndividual ind, String symbol, int posGenotype, int depth)
 	{
-		if (isTerminal(symbol)) {
-			phenotype.addNode(getTerminal(symbol));
-		}
-		else{
+		if (isTerminal(symbol)) 
+			ind.getPhenotype().addNode(getTerminal(symbol));
+		else
+		{	
+			NonTerminalNode selectedProduction = new NonTerminalNode();
 			if(depth < getMaxDerivSize()-1)
-			{
-				NonTerminalNode selectedProduction = selectProduction(symbol, genotype, posGenotype, false);
-				// Increment position of genotype going back if it's necessary
-				posGenotype++;
-				if(posGenotype==genotype.length-1)
-					posGenotype = 0;
-				if (selectedProduction != null) {
-					// Add this node
-					phenotype.addNode(selectedProduction);
-					for(int i=0; i<selectedProduction.getProduction().length; i++)
-						posGenotype = grow(phenotype, selectedProduction.getProduction()[i], genotype, posGenotype, depth+1);
-				}
-				else
-					posGenotype = grow(phenotype, symbol, genotype, posGenotype, depth);
+				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype);
+			else
+				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, true);
+			
+			// Increment position of genotype going back if it's necessary
+			posGenotype++;
+			if(posGenotype==ind.getGenotype().length-1)
+				posGenotype = 0;
+			if (selectedProduction != null){
+				ind.getPhenotype().addNode(selectedProduction);
+				for(int i=0; i<selectedProduction.getProduction().length; i++)
+					posGenotype = grow(ind, selectedProduction.getProduction()[i], posGenotype, depth+1);
 			}
 			else
 			{
-				NonTerminalNode selectedProduction = selectProduction(symbol, genotype, posGenotype, true);
-				// Increment position of genotype going back if it's necessary
-				posGenotype++;
-				if(posGenotype==genotype.length-1)
-					posGenotype = 0;
-				if (selectedProduction != null){
-					phenotype.addNode(selectedProduction);
-					for(int i=0; i<selectedProduction.getProduction().length; i++){
-						posGenotype = grow(phenotype, selectedProduction.getProduction()[i], genotype, posGenotype, depth+1);
-					}
-				}
-				else
-				{
-					mappingValid = false;
-					return posGenotype;
-				}
+				ind.setFeasibility(false);
+				return posGenotype;
 			}
 		}
 		return posGenotype;
-	}*/
+	}
+
+	/**
+	 * Map the phenotype from a given genotype using a full technique
+	 * 
+	 * @param phenotype Phenotype of an individual
+	 * @param symbol Symbol to add
+	 * @param genotype Genotype to be mapped
+	 * @param posGenotype Reading position of the genotype
+	 * @param depth Actual depth of the tree
+	 */
 	
-	public int grow(GEIndividual ind, String symbol, int posGenotype, int depth)
+	public int full(GEIndividual ind, String symbol, int posGenotype, int depth) 
 	{
 		if (isTerminal(symbol)) 
 			ind.getPhenotype().addNode(getTerminal(symbol));
@@ -360,10 +357,12 @@ public class GESchema extends SyntaxTreeSchema
 			if (selectedProduction != null){
 				ind.getPhenotype().addNode(selectedProduction);
 				for(int i=0; i<selectedProduction.getProduction().length; i++)
-					posGenotype = grow(ind, selectedProduction.getProduction()[i], posGenotype, depth+1);
+					posGenotype = full(ind, selectedProduction.getProduction()[i], posGenotype, depth+1);
 			}
 			else
 			{
+				//if(symbol.equals("monomio"))
+					System.out.println("he entrado a individuo invalido con symbol:"+symbol);
 				ind.setFeasibility(false);
 				return posGenotype;
 			}

@@ -362,7 +362,7 @@ public class GESchema extends SyntaxTreeSchema
 			else
 			{
 				//if(symbol.equals("monomio"))
-					System.out.println("he entrado a individuo invalido con symbol:"+symbol);
+					//System.out.println("he entrado a individuo invalido con symbol:"+symbol);
 				ind.setFeasibility(false);
 				return posGenotype;
 			}

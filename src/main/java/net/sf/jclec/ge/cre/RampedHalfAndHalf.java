@@ -1,10 +1,13 @@
 package net.sf.jclec.ge.cre;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jclec.IIndividual;
+import net.sf.jclec.ISpecies;
 import net.sf.jclec.ge.GECreator;
 import net.sf.jclec.ge.GEIndividual;
+import net.sf.jclec.ge.GESpecies;
 
 /**
  * GEIndividual creator which maps the phenotype with the ramped half-and-half method.
@@ -70,11 +73,48 @@ public class RampedHalfAndHalf extends GECreator
 	
 	public List<IIndividual> provide(int numberOfIndividuals) 
 	{
-		int nOfGroups = schema.getMaxDerivSize()-1;
+		// Prepare process
+		prepareCreation();
+		GEIndividual newInd = null;
+		// Set numberOfIndividuals
+		this.numberOfIndividuals = numberOfIndividuals;
+		// Result list
+		createdBuffer = new ArrayList<IIndividual> (numberOfIndividuals);
+		// Get the original max depth
+		int maxDepth = schema.getMaxDerivSize();
+		// Get the number of individuals for each group and the rest too
+		int nOfIndividualGroup = numberOfIndividuals/(schema.getMaxDerivSize()-1);
+		int restOfIndividuals = numberOfIndividuals%(schema.getMaxDerivSize()-1);
+		// Get the root symbol
+		String rootSymbol = schema.getRootSymbol();
 		
-		// TODO Auto-generated method stub
-		// TODO Modificar la profundidad maxima del esquema y devolverle su valor inicial al finalizar el metodo
-		return null;
+		for(int i=2; i<maxDepth; i++)
+		{
+			schema.setMaxDerivSize(i);
+			for(int j=0; j<nOfIndividualGroup;j++)
+			{
+				newInd = new GEIndividual(createGenotype());
+				if(randgen.coin())
+					schema.grow(newInd, rootSymbol, 0, 0);
+				else
+					schema.full(newInd, rootSymbol, 0, 0);
+				createdBuffer.add(newInd);
+			}
+		}
+		
+		// Assign the rest of the individuals
+		for(int i=restOfIndividuals; i>0; i--)
+		{
+			schema.setMaxDerivSize(i);
+			if(randgen.coin())
+				schema.grow(newInd, rootSymbol, 0, 0);
+			else
+				schema.full(newInd, rootSymbol, 0, 0);
+			createdBuffer.add(newInd);
+		}
+				
+		schema.setMaxDerivSize(maxDepth);
+		return createdBuffer;
 	}
 	
 	@Override

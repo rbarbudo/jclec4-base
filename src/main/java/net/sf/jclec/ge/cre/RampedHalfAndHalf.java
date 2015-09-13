@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jclec.IIndividual;
-import net.sf.jclec.ISpecies;
 import net.sf.jclec.ge.GECreator;
 import net.sf.jclec.ge.GEIndividual;
-import net.sf.jclec.ge.GESpecies;
 
 /**
  * GEIndividual creator which maps the phenotype with the ramped half-and-half method.
@@ -75,44 +73,39 @@ public class RampedHalfAndHalf extends GECreator
 	{
 		// Prepare process
 		prepareCreation();
-		GEIndividual newInd = null;
 		// Set numberOfIndividuals
 		this.numberOfIndividuals = numberOfIndividuals;
 		// Result list
 		createdBuffer = new ArrayList<IIndividual> (numberOfIndividuals);
-		// Get the original max depth
-		int maxDepth = schema.getMaxDerivSize();
-		// Get the number of individuals for each group and the rest too
-		int nOfIndividualGroup = numberOfIndividuals/(schema.getMaxDerivSize()-1);
-		int restOfIndividuals = numberOfIndividuals%(schema.getMaxDerivSize()-1);
 		// Get the root symbol
 		String rootSymbol = schema.getRootSymbol();
+		// Original max depth
+		int maxDepth = schema.getMaxDerivSize();
+		// Current depth
+		int currentDepth = schema.getMinDerivSize(rootSymbol);
+		// Get the number of individuals for each group and the rest too
+		int nOfIndividualPerGroup = numberOfIndividuals/(schema.getMaxDerivSize()-schema.getMinDerivSize(rootSymbol)+1);		
 		
-		for(int i=2; i<maxDepth; i++)
+		for(int i=0; i<this.numberOfIndividuals; i++)
 		{
-			schema.setMaxDerivSize(i);
-			for(int j=0; j<nOfIndividualGroup;j++)
-			{
-				newInd = new GEIndividual(createGenotype());
-				if(randgen.coin())
-					schema.grow(newInd, rootSymbol, 0, 0);
-				else
-					schema.full(newInd, rootSymbol, 0, 0);
-				createdBuffer.add(newInd);
-			}
-		}
-		
-		// Assign the rest of the individuals
-		for(int i=restOfIndividuals; i>0; i--)
-		{
-			schema.setMaxDerivSize(i);
+			schema.setMaxDerivSize(currentDepth);
+			GEIndividual newInd = new GEIndividual(createGenotype());
+			// Map phenotype with grow or full method
 			if(randgen.coin())
 				schema.grow(newInd, rootSymbol, 0, 0);
 			else
-				schema.full(newInd, rootSymbol, 0, 0);
+				schema.full(newInd, rootSymbol, 0, 0);	
+			//Add the new individual
 			createdBuffer.add(newInd);
+			// Increase the current depth if it's necesary
+			if(i%nOfIndividualPerGroup==0)
+			{
+				currentDepth++;
+				if(currentDepth == maxDepth)
+					currentDepth = schema.getMinDerivSize(rootSymbol);
+			}
 		}
-				
+		//Restore the original depth
 		schema.setMaxDerivSize(maxDepth);
 		return createdBuffer;
 	}

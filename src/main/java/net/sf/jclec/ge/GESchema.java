@@ -1,6 +1,7 @@
 package net.sf.jclec.ge;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -135,7 +136,6 @@ public class GESchema implements JCLEC
 		// Set minDepthSize map
 		setMinDepthMap();
 		System.out.println(minDepthMap);
-		System.exit(0);
 	}
 
 	/**
@@ -368,21 +368,9 @@ public class GESchema implements JCLEC
 				rulesList.add(prodRule);
 
 		prodRules = rulesList.toArray(new NonTerminalNode [rulesList.size()]);
-		
-		/*if(prodRules.length==0)
-		{
-			System.out.println("lista vacia");
-			System.exit(0);
-		}*/
 
 		if(prodRules.length == 0)
-		{
-			System.out.println("esta vacia");
-			System.out.println("maxdepth:"+this.maxDepthSize);
-			System.out.println("depth:"+depth);
-			System.out.println("symbol:"+symbol);
 			return null;
-		}
 
 		// Number of productions
 		int nOfProdRules = prodRules.length;
@@ -474,16 +462,14 @@ public class GESchema implements JCLEC
 		
 	public void calculateMinDepthSize() 
 	{
+		List <NonTerminalNode> prodRules = new ArrayList<NonTerminalNode>(Arrays.asList(nonTerminals));
+		Set<String> symbolsVisited = new HashSet<String>();
+		Set<String> auxSymbolsVisited = new HashSet<String>();
 		boolean nonTerminalFound = false;
 		boolean isCalculable = true;
-		Set<String> symbolsVisited = new HashSet<String>();
-		int nOfProductions = nonTerminals.length;
-		int productionsCalculated = 0;
 		int actualDepth = 1;
-		 
-		
-		// Buscamos aquellos no terminales cuyas producciones sean solo terminales
-		for(NonTerminalNode prodRule: nonTerminals)
+				
+		for(NonTerminalNode prodRule: prodRules)
 		{
 			for(String symbol: prodRule.getProduction())
 				if(!isTerminal(symbol))
@@ -493,99 +479,31 @@ public class GESchema implements JCLEC
 			{
 				minDepthMap.put(prodRule, 1);
 				symbolsVisited.add(prodRule.getSymbol());
-				productionsCalculated++;
+				prodRules.remove(prodRule);
 			}
 			nonTerminalFound = false;
 		}
-		
-		while(productionsCalculated < nOfProductions)
+		actualDepth++;	
+		while(!prodRules.isEmpty())
 		{
-			System.out.println(productionsCalculated);
-			isCalculable = true;
-			for(NonTerminalNode prodRule: nonTerminals)
+			for(NonTerminalNode prodRule: prodRules.toArray(new NonTerminalNode [prodRules.size()]))
 			{
-				if(getMinDepthSize(prodRule) == -1)
+				for(String symbol: prodRule.getProduction())
+					if((!symbolsVisited.contains(symbol))&&(!isTerminal(symbol)))
+						isCalculable = false;
+				
+				if(isCalculable == true)
 				{
-					for(String symbol: prodRule.getProduction())
-						if((!symbolsVisited.contains(symbol))&&(!isTerminal(symbol)))
-							isCalculable = false;
-					
-					if(isCalculable)
-					{
-						minDepthMap.put(prodRule, actualDepth);
-						symbolsVisited.add(prodRule.getSymbol());
-						productionsCalculated++;
-					}
-					isCalculable = true;
+					minDepthMap.put(prodRule, actualDepth);
+					auxSymbolsVisited.add(prodRule.getSymbol());
+					prodRules.remove(prodRule);
 				}
+				isCalculable = true;
 			}
+			symbolsVisited = auxSymbolsVisited;
 			actualDepth++;
 		}
 	}
-		
-		
-		
-		/*
-		// Flag which indicates if there is any non-terminal symbol
-		boolean nonTerminalFound;
-		// Array of the production's depths
-		int [] depths = new int [prodRule.getProduction().length];
-		// Index of the depths array
-		int i = 0;
-		// Auxiliar depth
-		int auxDepth;
-		
-		// It has not already been calculated
-		if(getMinDepthSize(prodRule) == -1)
-		{
-			nonTerminalFound = false;
-			for(String symbol : prodRule.getProduction())
-			{
-				if(isTerminal(symbol) == false)
-				{
-					nonTerminalFound = true;
-					NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
-					System.out.println(prodRules[0]);
-					depths[i] = calculateMinDepthSize(prodRules[0]);
-					for(NonTerminalNode production: prodRules)
-					{
-						auxDepth = calculateMinDepthSize(production);
-						if(auxDepth < depths[i])
-						{
-							depths[i] = auxDepth;
-						}
-					}
-				}
-				else
-				{
-					depths[i] = 1;
-				}
-				i++;
-			}
-			// All symbols are terminal
-			if(nonTerminalFound == false)
-			{
-				System.out.println("he entrado");
-				setMinDepthSize(prodRule, 1);
-				return 1;
-			}
-			// At least one symbol is non-terminal
-			else
-			{
-				int maxDepth = depths[0];
-				for(int j=1; j<prodRule.getProduction().length;j++)
-					if(depths[j] > maxDepth)
-						maxDepth = depths[j];
-				System.out.println("he entrado");
-				setMinDepthSize(prodRule, maxDepth);
-				return maxDepth;
-			}
-		}
-		// It has already been calculated
-		else
-			return getMinDepthSize(prodRule);
-		 
-	}*/
 	
 	/**
 	 * Get the point of derivation dissimilarity for two given genotypes.

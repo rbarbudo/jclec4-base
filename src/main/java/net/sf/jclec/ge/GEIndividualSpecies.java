@@ -136,14 +136,14 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	}
 	
 	/**
-	 * Set the maximum derivation size for this schema.
+	 * Set the maximum depth size for this schema.
 	 * 
-	 * @param maxDerivSize Maximum of derivations 
+	 * @param maxDpthSize Maximum depth
 	 */
 	
-	private void setMaxDerivSize(int maxDerivSize) 
+	private void setMaxDepthSize(int maxDepthSize) 
 	{
-		genotypeSchema.setMaxDerivSize(maxDerivSize);	
+		genotypeSchema.setMaxDepthSize(maxDepthSize);	
 	}
 	
 	/**
@@ -163,15 +163,15 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			// Get the file where the code of the terminal nodes is located
 			String codeFile = settings.getString("code-file");
 			
-			// Get the non terminal nodes and set to the genotype
-			setNonTerminals(gp.getNonTerminals(bnfFile));
-			// Get the root symbol and set to the genotype
-			setRootSymbol(gp.getRootNode(bnfFile));
 			// Get all the terminals node
 			terminals = gp.getTerminals(bnfFile);
 			// Set the code to the list of terminals and set them to the genotype
 			terminals = gp.setTerminalsCode(codeFile, terminals);
 			setTerminals(terminals);
+			// Get the non terminal nodes and set to the genotype
+			setNonTerminals(gp.getNonTerminals(bnfFile));
+			// Get the root symbol and set to the genotype
+			setRootSymbol(gp.getRootNode(bnfFile));
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -216,8 +216,8 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		setIndividualArrayGenotype(individualArray);
 		
 		// Get max-tree-depth
-		int maxDerivSize = settings.getInt("max-deriv-size");
-		setMaxDerivSize(maxDerivSize);
+		int maxDepthSize = settings.getInt("max-depth-size");
+		setMaxDepthSize(maxDepthSize);
 	}
 
 	/**

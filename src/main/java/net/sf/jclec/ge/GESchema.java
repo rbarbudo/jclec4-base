@@ -1,12 +1,14 @@
 package net.sf.jclec.ge;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import net.sf.jclec.JCLEC;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
-import net.sf.jclec.syntaxtree.SyntaxTree;
-import net.sf.jclec.syntaxtree.SyntaxTreeSchema;
+import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.intset.IIntegerSet;
 
 /**
@@ -15,7 +17,7 @@ import net.sf.jclec.util.intset.IIntegerSet;
  * @author Rafael Barbudo Lunar
  */
 
-public class GESchema extends SyntaxTreeSchema 
+public class GESchema implements JCLEC 
 {
 	/////////////////////////////////////////////////////////////////
 	// --------------------------------------- Serialization constant
@@ -29,13 +31,41 @@ public class GESchema extends SyntaxTreeSchema
 	// --------------------------------------------------- Properties
 	/////////////////////////////////////////////////////////////////
 	
+	/** All terminals */
+	
+	protected TerminalNode [] terminals;
+
+	/** All non terminals */
+	
+	protected NonTerminalNode [] nonTerminals;
+
+	/** Root symbol name */
+	
+	protected String rootSymbol;
+	
+	/** Maximum of depth per tree */
+	
+	protected int maxDepthSize;
+	
 	/** Individual array genotype */
 	
 	protected IIntegerSet [] individualArrayGenotype;
 	
-	/** Number of derivations realized */
+	/////////////////////////////////////////////////////////////
+	// --------------------------------------- Internal variables
+	///////////////////////////////////////////////////////////// 
 	
-	protected int nOfDer = 0;
+	/** Terminal symbols map */
+	
+	protected transient HashMap<String, TerminalNode> terminalsMap;
+
+	/** Non terminal symbols map */
+	
+	protected transient HashMap<String, NonTerminalNode[]> nonTerminalsMap;
+	
+	/** Minimum depth map */
+
+	protected transient HashMap<NonTerminalNode, Integer> minDepthMap;
 	
 	/////////////////////////////////////////////////////////////////
 	// -------------------------------------------------- Constructor
@@ -45,13 +75,245 @@ public class GESchema extends SyntaxTreeSchema
 	 * Empty constructor
 	 */
 	
-	public GESchema() {
+	public GESchema() 
+	{
 		super();
 	}
 	
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Sets the maximum depth of the tree
+	 * 
+	 * @param maxDepthSize
+	 */
+
+	public void setMaxDepthSize(int maxDepthSize) 
+	{
+		this.maxDepthSize = maxDepthSize;
+	}
+	
+	/**
+	 * Get the maximum depth size
+	 * 
+	 * @return maximum depth size
+	 */
+		
+	public int getMaxDepthSize() 
+	{
+		return maxDepthSize;
+	}
+	
+	/**
+	 * Set all the terminal symbols for this grammar
+	 * 
+	 * @param terminals Terminals set
+	 */
+	
+	public void setTerminals(TerminalNode[] terminals) 
+	{
+		// Set terminal symbols
+		this.terminals = terminals;
+		// Set terminal symbols map
+		setTerminalsMap();
+	}
+
+	/**
+	 * Set all the non terminal symbols for this grammar
+	 * 
+	 * @param nonTerminals Non terminal symbols
+	 */
+	
+	public void setNonTerminals(NonTerminalNode[] nonTerminals) 
+	{
+		// Set non-terminal symbols
+		this.nonTerminals = nonTerminals;
+		// Set non-terminal symbols map
+		setNonTerminalsMap();
+		// Set minDepthSize map
+		setMinDepthMap();
+		System.out.println(minDepthMap);
+		System.exit(0);
+	}
+
+	/**
+	 * Set the start symbol for this grammar
+	 * 
+	 * @param rootSymbol Start symbol
+	 */
+	
+	public void setRootSymbol(String rootSymbol) 
+	{
+		this.rootSymbol = rootSymbol;
+	}
+
+	/**
+	 * Get the root symbol
+	 * 
+	 * @return root symbol
+	 */
+
+	public String getRootSymbol() 
+	{
+		return rootSymbol;
+	}
+	
+	/**
+	 * Get the array of terminal nodes
+	 * 
+	 * @return terminal nodes
+	 */
+		
+	public TerminalNode[] getTerminals() 
+	{
+		return terminals;
+	}
+	
+	/**
+	 * Get the array of nonterminal nodes
+	 * 
+	 * @return nonterminal nodes
+	 */
+		
+	public NonTerminalNode[] getNonTerminals() 
+	{
+		return nonTerminals;
+	}
+	
+	/**
+	 * Checks if a symbol is terminal
+	 * 
+	 * @param symbol the symbol
+	 * 
+	 * @return true or false
+	 */
+		
+	public boolean isTerminal(String symbol)
+	{
+		return terminalsMap.containsKey(symbol);
+	}
+	
+	/**
+	 * Build and set the terminals map.
+	 */
+		
+	protected final void setTerminalsMap() 
+	{
+		terminalsMap = new HashMap<String, TerminalNode> ();
+		for (TerminalNode termSymbol : terminals) {
+			terminalsMap.put(termSymbol.getSymbol(), termSymbol);
+		}
+	}
+	
+	/**
+	 * Build and set the minimum depth map.
+	 */
+		
+	protected final void setMinDepthMap() 
+	{
+		minDepthMap = new HashMap<NonTerminalNode, Integer> ();
+		
+		for (NonTerminalNode nonTermSymbol : nonTerminals)
+			minDepthMap.put(nonTermSymbol, -1);
+		calculateMinDepthSize();
+	}
+	
+	/**
+	 * Gets the minimum depth size for a given production
+	 * 
+	 * @param production which we need to get minimum depth size
+	 * 
+	 * @return minimum depth size
+	 */
+		
+	public int getMinDepthSize(NonTerminalNode production) 
+	{
+		return minDepthMap.get(production);
+	}	
+	
+	/**
+	 * Gets the minimum depth size for a given symbol
+	 * 
+	 * @param gumbol which we need to get minimum depth size
+	 * 
+	 * @return minimum depth size
+	 */
+		
+	public int getMinDepthSize(String symbol) 
+	{
+		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
+		int minDepth = getMinDepthSize(prodRules[0]);
+		
+		for(NonTerminalNode prodRule: prodRules)
+			if((getMinDepthSize(prodRule) < minDepth)&&(getMinDepthSize(prodRule) != -1))
+				minDepth = getMinDepthSize(prodRule);
+		
+		return minDepth;
+	}
+	
+	/**
+	 * Sets the minimum depth size for a given symbol
+	 * 
+	 * @param production which we need to set minimum depth size
+	 * @param minDepthSize minimum depth
+	 * 
+	 */
+	
+	public void setMinDepthSize(NonTerminalNode production, int minDepthSize)
+	{
+		System.out.println("he entrado");
+		minDepthMap.put(production, minDepthSize);
+	}
+	
+	/**
+	 * Build and set the non terminals map.
+	 */
+
+	protected final void setNonTerminalsMap() 
+	{
+		// Used to classify symbols
+		HashMap<String, List<NonTerminalNode>> auxMap = 
+			new HashMap<String, List<NonTerminalNode>> ();
+		// Classify non-term symbols
+		for (NonTerminalNode nonTermSymbol : nonTerminals) {
+			String nonTermSymbolName = nonTermSymbol.getSymbol();
+			if (auxMap.containsKey(nonTermSymbolName)) {
+				auxMap.get(nonTermSymbolName).add(nonTermSymbol);
+			}
+			else {
+				ArrayList<NonTerminalNode> list = 
+					new ArrayList<NonTerminalNode>();
+				list.add(nonTermSymbol);
+				auxMap.put(nonTermSymbolName, list);
+			}
+		}			
+		// Create non-term symbols map
+		nonTerminalsMap = new HashMap<String, NonTerminalNode[]> ();
+		for (String nonTermName : auxMap.keySet()) {
+			// Get symbols list
+			List<NonTerminalNode> list = auxMap.get(nonTermName);
+			// Convert list to array
+			NonTerminalNode [] array = 
+				list.toArray(new NonTerminalNode[list.size()]);
+			// Put array in non terminals map
+			nonTerminalsMap.put(nonTermName, array);
+		}
+	}
+	
+	/**
+	 * Get a terminal giving his name.
+	 *  
+	 * @param symbol Symbol name
+	 * 
+	 * @return Desired symbol
+	 */
+	
+	public final TerminalNode getTerminal(String symbol)
+	{
+		return terminalsMap.get(symbol);
+	}
 	
 	/**
 	 * Sets the schema for the individual array genotype
@@ -62,63 +324,6 @@ public class GESchema extends SyntaxTreeSchema
 	public final void setIndividualArrayGenotype(IIntegerSet[] individualArray) 
 	{
 		this.individualArrayGenotype = individualArray;
-	}
-	
-	/**
-	 * Create the phenotype for a given genotype
-	 * 
-	 * @param genotype Genotype of an individual
-	 * 
-	 * @return new SyntaxTree
-	 */
-	
-	public SyntaxTree createSyntaxTree(int [] genotype)
-	{
-		// Create resulting tree
-		SyntaxTree result = new SyntaxTree();
-		// Fill result branch
-		fillSyntaxBranch(result, rootSymbol, genotype, 0);
-		// Once the tree is created, the number of derivations is reset
-		this.nOfDer = 0;
-		// Return resulting tree 
-		return result;
-	}
-
-	/**
-	 * Fills a syntaxtree using the symbol
-	 * 
-	 * @param owner given syntaxtree
-	 * @param symbol Symbol to add
-	 * @param genotype Genotype of an individual
-	 * @param posGenotype Reading position of the genotype
-	 * 
-	 * @return Actual position of the genotype
-	 */
-	
-	public int fillSyntaxBranch(SyntaxTree owner, String symbol, int [] genotype, int posGenotype)
-	{
-		if (isTerminal(symbol)) {
-			owner.addNode(getTerminal(symbol));
-		}
-		else {
-			// Select a production rule
-			NonTerminalNode selectedProduction = selectProduction(symbol, genotype, posGenotype);
-			// Increment position of genotype going back if it's necessary
-			posGenotype++;
-			if(posGenotype==genotype.length-1)
-				posGenotype = 0;
-			if (selectedProduction != null) {
-				// Add this node
-				owner.addNode(selectedProduction);								
-				// Expand production symbols
-				for(int i=0; i<selectedProduction.getProduction().length; i++)
-					posGenotype = fillSyntaxBranch(owner, selectedProduction.getProduction()[i], genotype, posGenotype);
-			}
-			else {
-				posGenotype = fillSyntaxBranch(owner, symbol, genotype, posGenotype);
-			}
-		}
-		return posGenotype;
 	}
 	
 	/**
@@ -134,6 +339,51 @@ public class GESchema extends SyntaxTreeSchema
 	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype)
 	{			
 		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
+		// Number of productions
+		int nOfProdRules = prodRules.length;
+		// Choose production based on the genotype
+		int chosen = genotype[posGenotype] % nOfProdRules;
+		// Return production chosen
+		return prodRules[chosen];	
+	}
+	
+	/**
+	 * Select a production rule for a symbol of the grammar.
+	 * 
+	 * @param symbol  Symbol to expand
+	 * @param genotype Genotype of an individual
+	 * @param posGenotype Reading position of the genotype
+	 * @param depth Actual depth of the tree
+	 * 
+	 * @return A production rule for  the given symbol.
+	 */	
+	
+	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype, int depth)
+	{
+		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
+		List <NonTerminalNode> rulesList = new ArrayList<NonTerminalNode>();
+				
+		for(NonTerminalNode prodRule: prodRules)
+			if(depth + getMinDepthSize(prodRule) < this.maxDepthSize)
+				rulesList.add(prodRule);
+
+		prodRules = rulesList.toArray(new NonTerminalNode [rulesList.size()]);
+		
+		/*if(prodRules.length==0)
+		{
+			System.out.println("lista vacia");
+			System.exit(0);
+		}*/
+
+		if(prodRules.length == 0)
+		{
+			System.out.println("esta vacia");
+			System.out.println("maxdepth:"+this.maxDepthSize);
+			System.out.println("depth:"+depth);
+			System.out.println("symbol:"+symbol);
+			return null;
+		}
+
 		// Number of productions
 		int nOfProdRules = prodRules.length;
 		// Choose production based on the genotype
@@ -214,28 +464,133 @@ public class GESchema extends SyntaxTreeSchema
 	}
 	
 	/**
-	 * Get the minimum derivation size for a given symbol
+	 * Get the minimum depth size for a given symbol
 	 * 
-	 * @param symbol for which we need to know the minimum derivation size
+	 * @param prodRule for which we need to know the minimum depth size
+	 * @param visitedRules Rules which we have already visited
 	 * 
-	 * @return minimum derivation size
+	 * @return minimum depth size
 	 */
 		
-	public int getMinDerivSize(String symbol) 
+	public void calculateMinDepthSize() 
 	{
-		for (int i=0; i<maxDerivSize; i++) {
-			if (!cardinality(symbol, i).equals(BigInteger.ZERO)) {
-				return i;
+		boolean nonTerminalFound = false;
+		boolean isCalculable = true;
+		Set<String> symbolsVisited = new HashSet<String>();
+		int nOfProductions = nonTerminals.length;
+		int productionsCalculated = 0;
+		int actualDepth = 1;
+		 
+		
+		// Buscamos aquellos no terminales cuyas producciones sean solo terminales
+		for(NonTerminalNode prodRule: nonTerminals)
+		{
+			for(String symbol: prodRule.getProduction())
+				if(!isTerminal(symbol))
+					nonTerminalFound = true;
+			
+			if(nonTerminalFound == false)
+			{
+				minDepthMap.put(prodRule, 1);
+				symbolsVisited.add(prodRule.getSymbol());
+				productionsCalculated++;
+			}
+			nonTerminalFound = false;
+		}
+		
+		while(productionsCalculated < nOfProductions)
+		{
+			System.out.println(productionsCalculated);
+			isCalculable = true;
+			for(NonTerminalNode prodRule: nonTerminals)
+			{
+				if(getMinDepthSize(prodRule) == -1)
+				{
+					for(String symbol: prodRule.getProduction())
+						if((!symbolsVisited.contains(symbol))&&(!isTerminal(symbol)))
+							isCalculable = false;
+					
+					if(isCalculable)
+					{
+						minDepthMap.put(prodRule, actualDepth);
+						symbolsVisited.add(prodRule.getSymbol());
+						productionsCalculated++;
+					}
+					isCalculable = true;
+				}
+			}
+			actualDepth++;
+		}
+	}
+		
+		
+		
+		/*
+		// Flag which indicates if there is any non-terminal symbol
+		boolean nonTerminalFound;
+		// Array of the production's depths
+		int [] depths = new int [prodRule.getProduction().length];
+		// Index of the depths array
+		int i = 0;
+		// Auxiliar depth
+		int auxDepth;
+		
+		// It has not already been calculated
+		if(getMinDepthSize(prodRule) == -1)
+		{
+			nonTerminalFound = false;
+			for(String symbol : prodRule.getProduction())
+			{
+				if(isTerminal(symbol) == false)
+				{
+					nonTerminalFound = true;
+					NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
+					System.out.println(prodRules[0]);
+					depths[i] = calculateMinDepthSize(prodRules[0]);
+					for(NonTerminalNode production: prodRules)
+					{
+						auxDepth = calculateMinDepthSize(production);
+						if(auxDepth < depths[i])
+						{
+							depths[i] = auxDepth;
+						}
+					}
+				}
+				else
+				{
+					depths[i] = 1;
+				}
+				i++;
+			}
+			// All symbols are terminal
+			if(nonTerminalFound == false)
+			{
+				System.out.println("he entrado");
+				setMinDepthSize(prodRule, 1);
+				return 1;
+			}
+			// At least one symbol is non-terminal
+			else
+			{
+				int maxDepth = depths[0];
+				for(int j=1; j<prodRule.getProduction().length;j++)
+					if(depths[j] > maxDepth)
+						maxDepth = depths[j];
+				System.out.println("he entrado");
+				setMinDepthSize(prodRule, maxDepth);
+				return maxDepth;
 			}
 		}
-		// This point should never be reached
-		return -1;
-	}
+		// It has already been calculated
+		else
+			return getMinDepthSize(prodRule);
+		 
+	}*/
 	
 	/**
 	 * Get the point of derivation dissimilarity for two given genotypes.
 	 * 
-	 * @param p0genotype  Symbol to expand
+	 * @param p0genotype Symbol to expand
 	 * @param p2genotype Genotype of an individual
 	 * 
 	 * @return The point of dissimilarity of the genotypes.
@@ -305,10 +660,7 @@ public class GESchema extends SyntaxTreeSchema
 		else
 		{	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
-			if(depth < getMaxDerivSize()-1)
-				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype);
-			else
-				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, true);
+			selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, depth);
 			
 			// Increment position of genotype going back if it's necessary
 			posGenotype++;
@@ -345,7 +697,7 @@ public class GESchema extends SyntaxTreeSchema
 		else
 		{	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
-			if(depth < getMaxDerivSize()-1)
+			if(depth < getMaxDepthSize()-1)
 				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, false);
 			else
 				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, true);
@@ -361,8 +713,6 @@ public class GESchema extends SyntaxTreeSchema
 			}
 			else
 			{
-				//if(symbol.equals("monomio"))
-					//System.out.println("he entrado a individuo invalido con symbol:"+symbol);
 				ind.setFeasibility(false);
 				return posGenotype;
 			}

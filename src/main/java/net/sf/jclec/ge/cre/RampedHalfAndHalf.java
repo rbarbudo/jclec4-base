@@ -80,15 +80,15 @@ public class RampedHalfAndHalf extends GECreator
 		// Get the root symbol
 		String rootSymbol = schema.getRootSymbol();
 		// Original max depth
-		int maxDepth = schema.getMaxDerivSize();
+		int maxDepth = schema.getMaxDepthSize();
 		// Current depth
-		int currentDepth = schema.getMinDerivSize(rootSymbol);
+		int currentDepth = schema.getMinDepthSize(rootSymbol);
 		// Get the number of individuals for each group and the rest too
-		int nOfIndividualPerGroup = numberOfIndividuals/(schema.getMaxDerivSize()-schema.getMinDerivSize(rootSymbol)+1);		
+		int nOfIndividualPerGroup = numberOfIndividuals/(schema.getMaxDepthSize()-schema.getMinDepthSize(rootSymbol)+1);		
 		
 		for(int i=0; i<this.numberOfIndividuals; i++)
 		{
-			schema.setMaxDerivSize(currentDepth);
+			schema.setMaxDepthSize(currentDepth);
 			GEIndividual newInd = new GEIndividual(createGenotype());
 			// Map phenotype with grow or full method
 			if(randgen.coin())
@@ -102,11 +102,11 @@ public class RampedHalfAndHalf extends GECreator
 			{
 				currentDepth++;
 				if(currentDepth == maxDepth)
-					currentDepth = schema.getMinDerivSize(rootSymbol);
+					currentDepth = schema.getMinDepthSize(rootSymbol);
 			}
 		}
 		//Restore the original depth
-		schema.setMaxDerivSize(maxDepth);
+		schema.setMaxDepthSize(maxDepth);
 		return createdBuffer;
 	}
 	

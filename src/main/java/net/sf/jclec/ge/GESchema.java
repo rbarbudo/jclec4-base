@@ -358,24 +358,27 @@ public class GESchema implements JCLEC
 	 * @return A production rule for  the given symbol.
 	 */	
 	
-	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype, int depth)
+	protected NonTerminalNode selectProductionGrow(String symbol, int [] genotype, int posGenotype, int depth)
 	{
 		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
-		List <NonTerminalNode> rulesList = new ArrayList<NonTerminalNode>();
+		// It keeps indices to the usable rules
+		List<Integer> possibleRules = new ArrayList<Integer>();
+		int i =0;
 				
 		for(NonTerminalNode prodRule: prodRules)
+		{
 			if(depth + getMinDepthSize(prodRule) < this.maxDepthSize)
-				rulesList.add(prodRule);
-
-		prodRules = rulesList.toArray(new NonTerminalNode [rulesList.size()]);
-
-		if(prodRules.length == 0)
+				possibleRules.add(i);
+			i++;
+		}
+			
+		if(possibleRules.isEmpty())
 			return null;
 
 		// Number of productions
-		int nOfProdRules = prodRules.length;
+		int nOfProdRules = possibleRules.size();
 		// Choose production based on the genotype
-		int chosen = genotype[posGenotype] % nOfProdRules;
+		int chosen = possibleRules.get(genotype[posGenotype] % nOfProdRules);
 		// Return production chosen
 		return prodRules[chosen];	
 	}
@@ -386,69 +389,48 @@ public class GESchema implements JCLEC
 	 * @param symbol  Symbol to expand
 	 * @param genotype Genotype of an individual
 	 * @param posGenotype Reading position of the genotype
-	 * @param onlyTerminal If it is true we must choose a production with only terminals and if it is false only non-terminals
+	 * @param depth Actual depth of the tree
 	 * 
 	 * @return A production rule for  the given symbol.
 	 */	
 	
-	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype, boolean onlyTerminal)
+	protected NonTerminalNode selectProductionFull(String symbol, int [] genotype, int posGenotype, int depth)
 	{			
 		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
-		List <NonTerminalNode> rulesList = new ArrayList<NonTerminalNode>();
-
-		if(onlyTerminal == true)
-		{	
-			boolean nonTerminalFound;
-			// Get only the terminal productions
-			for(int i=0; i<prodRules.length; i++)
-			{
-				nonTerminalFound = false;
-				for(int j=0; j<prodRules[i].getProduction().length; j++)
-				{
-					if(isTerminal(prodRules[i].getProduction()[j]) == false)
-					{
-						nonTerminalFound = true;
-						break;
-					}
-				}
-				if(nonTerminalFound == false)
-					rulesList.add(prodRules[i]);
-			}
-		}
-		else
-		{
-			boolean terminalFound;
-			// Get only the non-terminal productions
-			for(int i=0; i<prodRules.length; i++)
-			{
-				terminalFound = false;
-				for(int j=0; j<prodRules[i].getProduction().length; j++)
-				{
-					if(isTerminal(prodRules[i].getProduction()[j]) == true)
-					{
-						terminalFound = true;
-						break;
-					}
-				}
-				if(terminalFound == false)
-					rulesList.add(prodRules[i]);
-			}
-		}
+		// It keeps indices to the usable rules
+		List<Integer> possibleRules = new ArrayList<Integer>();
+		int i =0;
+		// Variable used to control if we are using recursiveProductions or not
+	    boolean recursiveRules = false;
 		
-		prodRules = rulesList.toArray(new NonTerminalNode [rulesList.size()]);
+	  // Iterate through the different rule productions
+		for(NonTerminalNode rule : prodRules)
+		{
+			if(depth + getMinDepthSize(rule) < this.maxDepthSize)
+			{
+				if(!recursiveRules && rule.isRecursive())
+				{
+					recursiveRules = true;
+					possibleRules.clear();
+				}
+				if(!recursiveRules || (recursiveRules && rule.isRecursive()))
+				{
+					possibleRules.add(i);
+				}
+			}
+			i++;
+		}
 		
 		// We control if there is not any production rule
-		if(prodRules.length == 0)
+		if(possibleRules.isEmpty())
 			return null;
 		
-		
 		// Number of productions
-		int nOfProdRules = prodRules.length;
+		int nOfProdRules = possibleRules.size();
 		// Choose production based on the genotype
-		int chosen = genotype[posGenotype] % nOfProdRules;
+		int chosen = possibleRules.get(genotype[posGenotype] % nOfProdRules);
 		// Return production chosen
-		return prodRules[chosen];
-		
+		return prodRules[chosen];			
 	}
 	
 	/**
@@ -463,6 +445,7 @@ public class GESchema implements JCLEC
 	public void calculateMinDepthSize() 
 	{
 		List <NonTerminalNode> prodRules = new ArrayList<NonTerminalNode>(Arrays.asList(nonTerminals));
+		List <NonTerminalNode> rulesDepthOne = new ArrayList<NonTerminalNode>();
 		Set<String> symbolsVisited = new HashSet<String>();
 		Set<String> auxSymbolsVisited = new HashSet<String>();
 		boolean nonTerminalFound = false;
@@ -479,10 +462,12 @@ public class GESchema implements JCLEC
 			{
 				minDepthMap.put(prodRule, 1);
 				symbolsVisited.add(prodRule.getSymbol());
-				prodRules.remove(prodRule);
+				rulesDepthOne.add(prodRule);
 			}
 			nonTerminalFound = false;
 		}
+		prodRules.removeAll(rulesDepthOne);
+		
 		actualDepth++;	
 		while(!prodRules.isEmpty())
 		{
@@ -578,7 +563,7 @@ public class GESchema implements JCLEC
 		else
 		{	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
-			selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, depth);
+			selectedProduction = selectProductionGrow(symbol, ind.getGenotype(), posGenotype, depth);
 			
 			// Increment position of genotype going back if it's necessary
 			posGenotype++;
@@ -615,10 +600,7 @@ public class GESchema implements JCLEC
 		else
 		{	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
-			if(depth < getMaxDepthSize()-1)
-				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, false);
-			else
-				selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, true);
+			selectedProduction = selectProductionFull(symbol, ind.getGenotype(), posGenotype, depth);
 			
 			// Increment position of genotype going back if it's necessary
 			posGenotype++;

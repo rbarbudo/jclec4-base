@@ -137,4 +137,19 @@ public class NonTerminalNode extends SyntaxTreeNode
 			return false;
 		}
 	}
+
+	/**
+	 * Tell us if the production is recursive or not
+	 * 
+	 * @return True if it is recursive and False if it isn't
+	 */
+	
+	public boolean isRecursive() 
+	{
+		for (String p : production)
+			if(p.equals(symbol))
+				return true;
+		
+		return false;
+	}
 }

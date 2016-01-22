@@ -33,6 +33,10 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	
 	private SyntaxTree phenotype = new SyntaxTree();
 	
+	/** Individual constants */
+	
+	private double [] constants;
+	
 	/** Phenotype validity */
 	
 	private boolean feasible = true;
@@ -61,6 +65,19 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 		super(genotype);
 	}
 	
+	/**
+	 * Constructor that sets individual genotype and constants
+	 * 
+	 * @param genotype Individual genotype
+	 * @param constants Individual constants
+	 */
+	
+	public GEIndividual(int[] genotype, double[] constants) 
+	{
+		super(genotype);
+		setConstants(constants);
+	}
+
 	/**
 	 * Constructor that sets individual genotype and phenotype
 	 * 
@@ -113,7 +130,29 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	{
 		this.phenotype = phenotype;
 	}
-
+	
+	/**
+	 * Getter for the individual constants
+	 * 
+	 * @return constants The constants of the individual
+	 */
+	
+	public double [] getConstants() 
+	{
+		return constants;
+	}
+	
+	/**
+	 * Setter for the individual constants
+	 * 
+	 * @param constants The constants to set
+	 */
+	
+	public void setConstants(double[] constants) 
+	{
+		this.constants = constants;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

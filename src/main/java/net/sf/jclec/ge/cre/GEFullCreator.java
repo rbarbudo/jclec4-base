@@ -44,7 +44,15 @@ public class GEFullCreator extends GECreator
 	{
 		String rootSymbol = schema.getRootSymbol();
 		int [] newGenotype = createGenotype();
-		GEIndividual newInd = new GEIndividual(newGenotype);
+		GEIndividual newInd;
+		
+		if(schema.getIndividualConstants().length > 0)
+		{
+			double [] constants = createConstants();
+			newInd = new GEIndividual(newGenotype, constants);
+		}
+		else
+			newInd = new GEIndividual(newGenotype);
 		
 		schema.full(newInd, rootSymbol, 0, 0);
 		// Add the new individual

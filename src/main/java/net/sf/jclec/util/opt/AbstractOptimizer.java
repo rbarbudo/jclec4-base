@@ -16,7 +16,7 @@ import net.sf.jclec.util.random.IRandGen;
  * @author Amelia Zafra
  * @author Sebastian Ventura
  *
- * @param <I> Type of individuals in system 
+ * @param <IIndividual> Type of individuals in system 
  */
 
 public abstract class AbstractOptimizer implements IOptimizer 

@@ -10,6 +10,7 @@ import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.grammar.GrammarParser;
 import net.sf.jclec.util.intset.IIntegerSet;
+import net.sf.jclec.util.range.IRange;
 
 /**
  * Species for GEIndividual
@@ -104,6 +105,17 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	}
 	
 	/**
+	 * Set the individual constant array.
+	 * 
+	 * @param constants Individual array schema
+	 */
+	
+	private void setIndividualConstant(IRange[] constants) 
+	{
+		genotypeSchema.setIndividualConstants(constants);
+	}
+	
+	/**
 	 * Set genotype schema
 	 * 
 	 * @param genotypeSchema New genotype schema
@@ -177,12 +189,53 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			e.printStackTrace();
 			System.exit(0);
 		}
+		
+		// Constant length
+		int constantLength = settings.getList("constant-schema.locus[@type]").size();
+		// Genotype schema
+		IRange [] constants = new IRange[constantLength];
+		// Set constants schema components
+		for(int i=0; i<constantLength; i++)
+		{
+			// Get component classname
+			String componentClassname = 
+					settings.getString("constant-schema.locus("+i+")[@type]");
+			try {
+				Class<?> componentClass = 
+						Class.forName(componentClassname);
+				// Set schema component
+				constants[i] = 
+						(IRange) componentClass.newInstance();
+				// Configure component
+				if (constants[i] instanceof IConfigure) {
+					((IConfigure) constants[i]).configure
+						(settings.subset("constant-schema.locus("+i+")"));
+				}
+			}
+			
+			catch(ClassNotFoundException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+			catch(IllegalAccessException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+			catch(InstantiationException e) {
+				e.printStackTrace();
+				System.exit(0);
+			}			
+		}
+		// Assign constants schema
+		setIndividualConstant(constants);
+		
 		// Genotype lenght
 		int genotypeLength = settings.getList("genotype-schema.locus[@type]").size();
 		// Genotype schema
 		IIntegerSet [] individualArray = new IIntegerSet[genotypeLength];
 		// Set genotype schema components
-		for (int i=0; i<genotypeLength; i++) {
+		for (int i=0; i<genotypeLength; i++) 
+		{
 			// Get component classname
 			String componentClassname = 
 					settings.getString("genotype-schema.locus("+i+")[@type]");

@@ -86,8 +86,22 @@ public abstract class GECreator extends AbstractCreator
 		return result;
 	}
 	
+	/**
+	 * Create a double [] constans, filling it randomly
+	 */
+	
+	protected final double [] createConstants()
+	{
+		int cl = schema.constants.length;
+		double [] result = new double[cl];
+		for(int i=0; i<cl; i++) {
+			result[i] = schema.constants[i].getRandom(randgen);
+		}
+		return result;
+	}
+	
 	@Override
-	protected void prepareCreation() 
+	protected void prepareCreation()
 	{
 		ISpecies spc = context.getSpecies();
 		if (spc instanceof GESpecies) {

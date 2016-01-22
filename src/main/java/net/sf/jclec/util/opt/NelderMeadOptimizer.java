@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import net.sf.jclec.IConfigure;
 import net.sf.jclec.IIndividual;
 import net.sf.jclec.ISystem;
+import net.sf.jclec.ge.GEIndividual;
+import net.sf.jclec.ge.GESpecies;
 import net.sf.jclec.ISpecies;
 import net.sf.jclec.IPopulation;
 
@@ -67,6 +69,10 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	/** Genotype schema */
 	
 	protected IRange [] schema;
+	
+	/** Specie */
+	
+	protected ISpecies spc;
 	
 	/////////////////////////////////////////////////////////////////
 	// ------------------------------------------------- Constructors
@@ -132,11 +138,44 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		this.maxIterations = maxIterations;
 	}
 	
+	// TODO comentar metodos para encapsular el tipo de individuo
+	
+	/*  Sirven para hacer generico el metodo y que trabaje con cualquier tipo de individuo
+		Por ejemplo si estamos trabajando con un individuo de tipo RealIndividual el array lo
+		constituirá su genotipo pero si estamos trabajando con GE el array será el pull de constantes
+	*/
+	
+	public void setRealArray(IIndividual ind, double [] realArray)
+	{
+		if (spc instanceof RealArraySpecies)
+			((RealArrayIndividual) ind).setGenotype(realArray);
+		if(spc instanceof GESpecies)
+			((GEIndividual) ind).setConstants(realArray);
+		else
+			throw new IllegalArgumentException("Species doesn't expected");
+	}
+	
+	public double [] getRealArray(IIndividual ind)
+	{
+		double [] realArray;
+		
+		if (spc instanceof RealArraySpecies)
+			realArray = ((RealArrayIndividual) ind).getGenotype();
+		if(spc instanceof GESpecies)
+			realArray = ((GEIndividual) ind).getConstants();
+		else
+			throw new IllegalArgumentException("Species doesn't expected");
+		
+		return realArray;	
+	}
+	
 	// IConfigure interface
 	
 	/**
 	 * {@inheritDoc} 
 	 */
+	
+	// TODO Revisar para ver en que momento se llama (cada cierto numero de it)
 	
 	public void configure(Configuration configuration)
 	{
@@ -161,18 +200,20 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	 * {@inheritDoc} 
 	 */
 	
-	@SuppressWarnings("unchecked")
 	public void contextualize(ISystem context)
 	{
 		super.contextualize(context);
 		
-		ISpecies spc = ((IPopulation) context).getSpecies();
+		spc = ((IPopulation) context).getSpecies();
 		// Get context species
 		if (spc instanceof RealArraySpecies) {
 			schema = ((RealArraySpecies) spc).getGenotypeSchema();
 		}
+		if(spc instanceof GESpecies) {
+			schema = ((GESpecies) spc).getGenotypeSchema().getIndividualConstants();
+		}
 		else {
-			throw new IllegalArgumentException("IRealArraySpecies expected");
+			throw new IllegalArgumentException("Species doesn't expected");
 		}
 		bettersSelector = new BettersSelector(context);
 	}
@@ -188,7 +229,10 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		for(int i=0; i<elem; i++) {			
 			if(soluciones.get(i).equals(mejorSolucion)){
 				for(int j=0; j<longitud; j++)
-					soluciones.get(i).getGenotype()[j] = 0.5*(soluciones.get(i).getGenotype()[j] + mejorSolucion.getGenotype()[j]);
+				{
+					//soluciones.get(i).getGenotype()[j] = 0.5*(soluciones.get(i).getGenotype()[j] + mejorSolucion.getGenotype()[j]);
+					getRealArray(soluciones.get(i))[j] = 0.5*getRealArray(soluciones.get(i))[j] + getRealArray(mejorSolucion)[j];
+				}
 			}	
 		}
 		evaluator.evaluate(soluciones);
@@ -205,7 +249,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		for(int i=0; i<longitud; i++){
 
 			//Use the factor and the centroide to change the solution 
-			realArray[i] =  valorCentroide[i] + factor*(valorCentroide[i]- indRespecto.getGenotype()[i]);
+			//realArray[i] =  valorCentroide[i] + factor*(valorCentroide[i]- indRespecto.getGenotype()[i]);
+			realArray[i] =  valorCentroide[i] + factor*(valorCentroide[i]- getRealArray(indRespecto)[i]);
 			
 			//Check the limits of the interval
 			a = ((Interval) schema[i]).getLeft();
@@ -220,7 +265,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 				realArray[i] = extremoSuperior;
 		}
 		
-		actual.setGenotype(realArray);
+		//actual.setGenotype(realArray);
+		setRealArray(actual, realArray);
 	}
 	
 	protected List<IIndividual> obtainExtremeSolutions(List<IIndividual> source, int longitud){
@@ -250,7 +296,10 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		{
 			for(int i=0; i<soluciones.size(); i++){
 				if(!soluciones.get(i).equals(worst))
-					valorCentroide[j] += (soluciones.get(i)).getGenotype()[j];
+				{
+					//valorCentroide[j] += (soluciones.get(i)).getGenotype()[j];
+					valorCentroide[j] += getRealArray(soluciones.get(i))[j];
+				}	
 			}
 		}
 		
@@ -262,7 +311,6 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	}
 	
  
-	@SuppressWarnings("unchecked")
 	protected List<IIndividual> generateSolutions(IIndividual solucionInicial, int longitud){
 		
 		List<IIndividual> result = new ArrayList<IIndividual>();
@@ -277,8 +325,9 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		for(int i=0; i<longitud; i++){
 			
 			IIndividual nuevaSolucion = (IIndividual) solucionInicial.copy();
-			realArray = nuevaSolucion.getGenotype();
-
+			//realArray = nuevaSolucion.getGenotype();
+			realArray = getRealArray(nuevaSolucion);
+			
 			//Assign new values to the solution
 			a = ((Interval) schema[i]).getLeft();
 			b = ((Interval) schema[i]).getRight();
@@ -297,7 +346,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			if(realArray[i] > extremoSuperior)
 				realArray[i] = extremoSuperior;
 			
-			nuevaSolucion.setGenotype(realArray);
+			//nuevaSolucion.setGenotype(realArray);
+			setRealArray(nuevaSolucion, realArray);
 			
 			result.add(nuevaSolucion);	
 		}
@@ -305,7 +355,6 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		return result;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public IIndividual optimize(IIndividual ind) 
 	{
 		
@@ -324,7 +373,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		lcontraction.add(contraction);
 		
 		//Obtain the lenght of the individuals
-		int length = ind.getGenotype().length;
+		//int length = ind.getGenotype().length;
+		int length = getRealArray(ind).length;
 		double [] centroideValue = new double[length];
 
 		for(int i=0; i<length; i++)
@@ -361,13 +411,15 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 				evaluator.evaluate(lextension);
 				
 				if(evaluator.getComparator().compare(reflection.getFitness(),extension.getFitness()) == -1){
-					extremeSolutions.get(0).setGenotype(extension.getGenotype());
+					//extremeSolutions.get(0).setGenotype(extension.getGenotype());
+					setRealArray(extremeSolutions.get(0), getRealArray(extension));
 					extremeSolutions.get(0).setFitness(extension.getFitness());
 					
 				}
 				else
 				{
-					extremeSolutions.get(0).setGenotype( reflection.getGenotype());
+					//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
+					setRealArray(extremeSolutions.get(0), getRealArray(reflection));
 					extremeSolutions.get(0).setFitness( reflection.getFitness());
 				
 				}
@@ -376,7 +428,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			//If the new solutions is better than the second worst solution, add the new solution
 			else if(evaluator.getComparator().compare(reflection.getFitness(),extremeSolutions.get(1).getFitness()) == 1){
 				
-				extremeSolutions.get(0).setGenotype(reflection.getGenotype());
+				//extremeSolutions.get(0).setGenotype(reflection.getGenotype());
+				setRealArray(extremeSolutions.get(0), getRealArray(reflection));
 				extremeSolutions.get(0).setFitness(reflection.getFitness());
 			}
 			
@@ -384,7 +437,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			{
 				//If the new solution is better than the worst solution, add the new solution
 				if(evaluator.getComparator().compare(reflection.getFitness(),extremeSolutions.get(0).getFitness()) == 1){
-					extremeSolutions.get(0).setGenotype( reflection.getGenotype());
+					//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
+					setRealArray(extremeSolutions.get(0), getRealArray(reflection));
 					extremeSolutions.get(0).setFitness( reflection.getFitness());
 				
 				}
@@ -397,7 +451,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 					//If the new solution is better than the worst solution, add the new solution 
 					if(evaluator.getComparator().compare(contraction.getFitness(),extremeSolutions.get(0).getFitness()) == 1)
 					{
-						extremeSolutions.get(0).setGenotype( contraction.getGenotype());
+						//extremeSolutions.get(0).setGenotype( contraction.getGenotype());
+						setRealArray(extremeSolutions.get(0), getRealArray(contraction));
 						extremeSolutions.get(0).setFitness( contraction.getFitness());
 					
 					}

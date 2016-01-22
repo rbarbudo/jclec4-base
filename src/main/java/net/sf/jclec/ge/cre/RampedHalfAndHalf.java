@@ -45,7 +45,15 @@ public class RampedHalfAndHalf extends GECreator
 	{
 		String rootSymbol = schema.getRootSymbol();
 		int [] newGenotype = createGenotype();
-		GEIndividual newInd = new GEIndividual(newGenotype);
+		GEIndividual newInd;
+		
+		if(schema.getIndividualConstants().length > 0)
+		{
+			double [] constants = createConstants();
+			newInd = new GEIndividual(newGenotype, constants);
+		}
+		else
+			newInd = new GEIndividual(newGenotype);
 		
 		if(randgen.coin())
 			schema.grow(newInd, rootSymbol, 0, 0);

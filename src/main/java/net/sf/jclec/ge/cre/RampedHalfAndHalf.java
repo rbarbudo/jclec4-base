@@ -96,7 +96,7 @@ public class RampedHalfAndHalf extends GECreator
 		for(int i=0; i<this.numberOfIndividuals; i++)
 		{
 			schema.setMaxDepthSize(currentDepth);
-			GEIndividual newInd = new GEIndividual(createGenotype());
+			GEIndividual newInd = new GEIndividual(createGenotype(), createConstants());
 			// Map phenotype with grow or full method
 			if(randgen.coin())
 				schema.grow(newInd, rootSymbol, 0, 0);

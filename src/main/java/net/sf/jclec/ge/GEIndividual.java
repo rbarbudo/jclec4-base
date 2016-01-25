@@ -44,15 +44,16 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	/////////////////////////////////////////////////////////////////
 	// ------------------------------------------------- Constructors
 	/////////////////////////////////////////////////////////////////
-		
-	/**
-	 * Empty constructor
-	 */
 	
-	public GEIndividual() 
-	{
-		super();
-	}
+//	/*
+//	/**
+//	 * Empty constructor
+//	 */
+//	
+//	public GEIndividual() 
+//	{
+//		super();
+//	}
 
 	/**
 	 * Constructor that sets individual genotype
@@ -79,31 +80,63 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	}
 
 	/**
-	 * Constructor that sets individual genotype and phenotype
+	 * Constructor that sets individual genotype, constants, and phenotype
 	 * 
 	 * @param genotype Individual genotype
 	 * @param phenotype Individual phenotype
+	 * @param constants Individual constants
 	 */
 	
-	public GEIndividual(int[] genotype, SyntaxTree phenotype) 
+	public GEIndividual(int[] genotype, SyntaxTree phenotype, double[] constants) 
 	{
 		super(genotype);
 		setPhenotype(phenotype);
+		setConstants(constants);
 	}
 	
 	/**
-	 * Constructor that sets individual genotype, phenotype and fitness
+	 * Constructor that sets individual genotype, constants, phenotype and fitness
 	 * 
 	 * @param genotype Individual genotype
 	 * @param phenotype Individual phenotype
-	 * @param fitness  Individual fitness
+	 * @param constants Individual constants
+	 * @param fitness Individual fitness
 	 */
 	
-	public GEIndividual(int[] genotype, SyntaxTree phenotype, IFitness fitness) 
+	public GEIndividual(int[] genotype, SyntaxTree phenotype, double[] constants, IFitness fitness) 
 	{
-		super(genotype, fitness);
+		super(genotype);
 		setPhenotype(phenotype);
+		setConstants(constants);
+		setFitness(fitness);
 	}
+	
+//	/**
+//	 * Constructor that sets individual genotype and phenotype
+//	 * 
+//	 * @param genotype Individual genotype
+//	 * @param phenotype Individual phenotype
+//	 */
+//	
+//	public GEIndividual(int[] genotype, SyntaxTree phenotype) 
+//	{
+//		super(genotype);
+//		setPhenotype(phenotype);
+//	}
+	
+//	/**
+//	 * Constructor that sets individual genotype, phenotype and fitness
+//	 * 
+//	 * @param genotype Individual genotype
+//	 * @param phenotype Individual phenotype
+//	 * @param fitness  Individual fitness
+//	 */
+//	
+//	public GEIndividual(int[] genotype, SyntaxTree phenotype, IFitness fitness) 
+//	{
+//		super(genotype, fitness);
+//		setPhenotype(phenotype);
+//	}
 	
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods
@@ -161,18 +194,26 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	{
 		// Genotype length
 		int gl = genotype.length;
-		// Allocate a copy of genotype and phenotype
-		int [] gother = new int[genotype.length];
+		
+		// Constant length
+		int cl = constants.length;
+		
+		// Allocate a copy of genotype, phenotype and constants
+		int [] gother = new int[gl];
+		double [] cother = new double[cl];
 		SyntaxTree pother = new SyntaxTree();
-		// Copy genotype and phenotype
+		
+		// Copy genotype, constants and phenotype
 		System.arraycopy(genotype, 0, gother, 0, gl);
+		System.arraycopy(constants, 0, cother, 0, cl);
 		pother = phenotype.copy();
+		
 		// Create new individuals, then return it
 		if (fitness != null) {
-			return new GEIndividual(gother, pother, fitness.copy());			
+			return new GEIndividual(gother, pother, cother, fitness.copy());			
 		}
 		else {
-			return new GEIndividual(gother, pother);			
+			return new GEIndividual(gother, pother, cother);			
 		}
 	}
 	
@@ -209,6 +250,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 			GEIndividual iaother = (GEIndividual) other;
 			EqualsBuilder eb = new EqualsBuilder();
 			eb.append(genotype, iaother.genotype);
+			eb.append(constants, iaother.constants);
 			eb.append(phenotype, iaother.phenotype);
 			eb.append(fitness, iaother.fitness);
 			return eb.isEquals();

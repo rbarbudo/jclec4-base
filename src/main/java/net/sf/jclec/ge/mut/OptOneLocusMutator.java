@@ -4,6 +4,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
 
 import net.sf.jclec.IConfigure;
+import net.sf.jclec.IPopulation;
+import net.sf.jclec.ISystem;
+import net.sf.jclec.ITool;
 import net.sf.jclec.ge.GEIndividual;
 import net.sf.jclec.util.opt.IOptimizer;
 
@@ -48,7 +51,6 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		int mp = getMutableLocus();
 		// Flip selected point
 		flip(mgenome, mp);
-		// TODO optimiza cuando muta o cada cierto numero de generaciones (prob vs iter)
 		mutant.setGenotype(mgenome);
 		GEIndividual optimizado = (GEIndividual) optimizer.optimize(mutant);
 		// Returns mutant
@@ -84,4 +86,20 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 			throw new ConfigurationRuntimeException("Problems creating an instance of optimizer", e);
 		}	
 	}
+	
+	public final void contextualize(ISystem context)
+	{
+		if(context instanceof IPopulation) {
+			// Contextualize this operator
+			this.context = (IPopulation) context;
+			// Attach a random generator to this object
+			this.randgen = context.createRandGen();
+			if(this.optimizer instanceof ITool)
+				this.optimizer.contextualize(context);
+		}
+		else {
+			throw new IllegalArgumentException("This object uses a population as execution context");
+		}
+	}
+	
 }

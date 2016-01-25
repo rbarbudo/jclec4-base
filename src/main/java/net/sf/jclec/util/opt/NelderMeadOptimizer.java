@@ -7,6 +7,7 @@ import net.sf.jclec.IConfigure;
 import net.sf.jclec.IIndividual;
 import net.sf.jclec.ISystem;
 import net.sf.jclec.ge.GEIndividual;
+import net.sf.jclec.ge.GEIndividualSpecies;
 import net.sf.jclec.ge.GESpecies;
 import net.sf.jclec.ISpecies;
 import net.sf.jclec.IPopulation;
@@ -158,7 +159,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	public double [] getRealArray(IIndividual ind)
 	{
 		double [] realArray;
-		
+				
 		if (spc instanceof RealArraySpecies)
 			realArray = ((RealArrayIndividual) ind).getGenotype();
 		if(spc instanceof GESpecies)
@@ -205,6 +206,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		super.contextualize(context);
 		
 		spc = ((IPopulation) context).getSpecies();
+		
 		// Get context species
 		if (spc instanceof RealArraySpecies) {
 			schema = ((RealArraySpecies) spc).getGenotypeSchema();
@@ -334,7 +336,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			
 			
 			dif = Math.abs(a-b);
-			
+						
 			realArray[i] += 0.1*dif;
 			
 			// Check the limits of the intervals
@@ -356,8 +358,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	}
 	
 	public IIndividual optimize(IIndividual ind) 
-	{
-		
+	{		
 		List<IIndividual> solutions;
 		//The first solution is the worst the solution, the second is the
 		//second worst solution and the third is the best solution
@@ -366,6 +367,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		List<IIndividual> lreflection = new ArrayList<IIndividual>();
 		List<IIndividual> lcontraction = new ArrayList<IIndividual>();
 		IIndividual extension = (IIndividual) ind.copy();
+
 		IIndividual reflection = (IIndividual) ind.copy();
 		IIndividual contraction = (IIndividual) ind.copy();
 		lextension.add(extension);

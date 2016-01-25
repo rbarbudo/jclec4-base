@@ -44,11 +44,10 @@ public class RampedHalfAndHalf extends GECreator
 	protected void createNext() 
 	{
 		String rootSymbol = schema.getRootSymbol();
-		int [] newGenotype = createGenotype();
 		GEIndividual newInd;
+		int [] newGenotype = createGenotype();
 		
-		if(schema.getIndividualConstants().length > 0)
-		{
+		if(schema.getIndividualConstants().length > 0) {
 			double [] constants = createConstants();
 			newInd = new GEIndividual(newGenotype, constants);
 		}
@@ -106,8 +105,7 @@ public class RampedHalfAndHalf extends GECreator
 			//Add the new individual
 			createdBuffer.add(newInd);
 			// Increase the current depth if it's necesary
-			if(i%nOfIndividualPerGroup==0)
-			{
+			if(i%nOfIndividualPerGroup==0) {
 				currentDepth++;
 				if(currentDepth == maxDepth)
 					currentDepth = schema.getMinDepthSize(rootSymbol);
@@ -120,10 +118,17 @@ public class RampedHalfAndHalf extends GECreator
 	
 	@Override
 	public GEIndividual createIndividual(int[] genotype) 
-	{
-		GEIndividual newInd = new GEIndividual(genotype);		
-		String rootSymbol = schema.getRootSymbol();
+	{		
+		GEIndividual newInd;
+		String rootSymbol = schema.getRootSymbol();		
 		
+		if(schema.getIndividualConstants().length > 0) {
+			double [] constants = createConstants();
+			newInd = new GEIndividual(genotype, constants);
+		}
+		else
+			newInd = new GEIndividual(genotype);
+				
 		if(randgen.coin())
 			schema.grow(newInd, rootSymbol, 0, 0);
 		else

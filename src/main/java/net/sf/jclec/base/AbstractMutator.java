@@ -69,7 +69,7 @@ public abstract class AbstractMutator implements IMutator
 	 * {@inheritDoc}
 	 */
 	
-	public final void contextualize(ISystem context)
+	public void contextualize(ISystem context)
 	{
 		if(context instanceof IPopulation) {
 			// Contextualize this operator

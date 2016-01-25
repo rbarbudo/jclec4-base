@@ -40,15 +40,7 @@ public class GEGrowCreator extends GECreator
 	protected void createNext() 
 	{
 		String rootSymbol = schema.getRootSymbol();
-		GEIndividual newInd;
-		int [] newGenotype = createGenotype();	
-		
-		if(schema.getIndividualConstants().length > 0){
-			double [] constants = createConstants();
-			newInd = new GEIndividual(newGenotype, constants);
-		}
-		else
-			newInd = new GEIndividual(newGenotype);
+		GEIndividual newInd = new GEIndividual(createGenotype());
 			
 		schema.grow(newInd, rootSymbol, 0, 0);
 		// Add the new individual
@@ -62,16 +54,8 @@ public class GEGrowCreator extends GECreator
 	@Override
 	public GEIndividual createIndividual(int [] genotype)
 	{
-		GEIndividual newInd;
+		GEIndividual newInd = new GEIndividual(genotype);
 		String rootSymbol = schema.getRootSymbol();
-		
-		if(schema.getIndividualConstants().length > 0){
-			double [] constants = createConstants();
-			newInd = new GEIndividual(genotype, constants);
-		}
-		else
-			newInd = new GEIndividual(genotype);
-		
 				
 		schema.grow(newInd, rootSymbol, 0, 0);
 		return newInd;

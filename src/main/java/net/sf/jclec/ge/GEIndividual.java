@@ -33,10 +33,6 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	
 	private SyntaxTree phenotype = new SyntaxTree();
 	
-	/** Individual constants */
-	
-	private double [] constants;
-	
 	/** Phenotype validity */
 	
 	private boolean feasible = true;
@@ -65,49 +61,32 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	{
 		super(genotype);
 	}
-	
-	/**
-	 * Constructor that sets individual genotype and constants
-	 * 
-	 * @param genotype Individual genotype
-	 * @param constants Individual constants
-	 */
-	
-	public GEIndividual(int[] genotype, double[] constants) 
-	{
-		super(genotype);
-		setConstants(constants);
-	}
 
 	/**
-	 * Constructor that sets individual genotype, constants, and phenotype
+	 * Constructor that sets individual genotype and phenotype
 	 * 
 	 * @param genotype Individual genotype
 	 * @param phenotype Individual phenotype
-	 * @param constants Individual constants
 	 */
 	
-	public GEIndividual(int[] genotype, SyntaxTree phenotype, double[] constants) 
+	public GEIndividual(int[] genotype, SyntaxTree phenotype) 
 	{
 		super(genotype);
 		setPhenotype(phenotype);
-		setConstants(constants);
 	}
 	
 	/**
-	 * Constructor that sets individual genotype, constants, phenotype and fitness
+	 * Constructor that sets individual genotype, phenotype and fitness
 	 * 
 	 * @param genotype Individual genotype
 	 * @param phenotype Individual phenotype
-	 * @param constants Individual constants
 	 * @param fitness Individual fitness
 	 */
 	
-	public GEIndividual(int[] genotype, SyntaxTree phenotype, double[] constants, IFitness fitness) 
+	public GEIndividual(int[] genotype, SyntaxTree phenotype, IFitness fitness) 
 	{
 		super(genotype);
 		setPhenotype(phenotype);
-		setConstants(constants);
 		setFitness(fitness);
 	}
 	
@@ -165,28 +144,6 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	}
 	
 	/**
-	 * Getter for the individual constants
-	 * 
-	 * @return constants The constants of the individual
-	 */
-	
-	public double [] getConstants() 
-	{
-		return constants;
-	}
-	
-	/**
-	 * Setter for the individual constants
-	 * 
-	 * @param constants The constants to set
-	 */
-	
-	public void setConstants(double[] constants) 
-	{
-		this.constants = constants;
-	}
-	
-	/**
 	 * {@inheritDoc}
 	 */
 	
@@ -194,26 +151,21 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	{
 		// Genotype length
 		int gl = genotype.length;
-		
-		// Constant length
-		int cl = constants.length;
-		
-		// Allocate a copy of genotype, phenotype and constants
+			
+		// Allocate a copy of genotype and phenotype
 		int [] gother = new int[gl];
-		double [] cother = new double[cl];
 		SyntaxTree pother = new SyntaxTree();
 		
-		// Copy genotype, constants and phenotype
+		// Copy genotype and phenotype
 		System.arraycopy(genotype, 0, gother, 0, gl);
-		System.arraycopy(constants, 0, cother, 0, cl);
 		pother = phenotype.copy();
 		
 		// Create new individuals, then return it
 		if (fitness != null) {
-			return new GEIndividual(gother, pother, cother, fitness.copy());			
+			return new GEIndividual(gother, pother, fitness.copy());			
 		}
 		else {
-			return new GEIndividual(gother, pother, cother);			
+			return new GEIndividual(gother, pother);			
 		}
 	}
 	
@@ -250,7 +202,6 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 			GEIndividual iaother = (GEIndividual) other;
 			EqualsBuilder eb = new EqualsBuilder();
 			eb.append(genotype, iaother.genotype);
-			eb.append(constants, iaother.constants);
 			eb.append(phenotype, iaother.phenotype);
 			eb.append(fitness, iaother.fitness);
 			return eb.isEquals();

@@ -150,8 +150,14 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	{
 		if (spc instanceof RealArraySpecies)
 			((RealArrayIndividual) ind).setGenotype(realArray);
-		if(spc instanceof GESpecies)
-			((GEIndividual) ind).setConstants(realArray);
+		if(spc instanceof GESpecies) {
+			// TODO
+			//((GEIndividual) ind).setConstants(realArray);
+		
+			
+			
+			
+		}
 		else
 			throw new IllegalArgumentException("Species doesn't expected");
 	}
@@ -162,8 +168,11 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 				
 		if (spc instanceof RealArraySpecies)
 			realArray = ((RealArrayIndividual) ind).getGenotype();
-		if(spc instanceof GESpecies)
-			realArray = ((GEIndividual) ind).getConstants();
+		if(spc instanceof GESpecies) {
+			// TODO
+			//realArray = ((GEIndividual) ind).getConstants();
+			
+		}
 		else
 			throw new IllegalArgumentException("Species doesn't expected");
 		
@@ -212,7 +221,9 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			schema = ((RealArraySpecies) spc).getGenotypeSchema();
 		}
 		if(spc instanceof GESpecies) {
-			schema = ((GESpecies) spc).getGenotypeSchema().getIndividualConstants();
+			// TODO
+			//schema = ((GESpecies) spc).getGenotypeSchema().getIndividualConstants();
+			
 		}
 		else {
 			throw new IllegalArgumentException("Species doesn't expected");

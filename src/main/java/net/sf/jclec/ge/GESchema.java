@@ -11,7 +11,6 @@ import net.sf.jclec.JCLEC;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.intset.IIntegerSet;
-import net.sf.jclec.util.range.IRange;
 
 /**
  * Schema for GEIndividual and its subclasses.
@@ -52,10 +51,6 @@ public class GESchema implements JCLEC
 	/** Individual array genotype */
 	
 	protected IIntegerSet [] individualArrayGenotype;
-	
-	/** Individual constants */
-	
-	protected IRange [] constants;
 	
 	/////////////////////////////////////////////////////////////
 	// --------------------------------------- Internal variables
@@ -330,29 +325,7 @@ public class GESchema implements JCLEC
 	{
 		this.individualArrayGenotype = individualArray;
 	}
-	
-	/**
-	 * Gets the schema for the individual array constants
-	 * 
-	 * @return constants Schema for the individual constants
-	 */
-	
-	public final IRange[] getIndividualConstants() 
-	{
-		return constants;
-	}
-	
-	/**
-	 * Sets the schema for the individual array constants
-	 * 
-	 * @param constants Schema for the individual constants
-	 */
-	
-	public final void setIndividualConstants(IRange[] constants) 
-	{
-		this.constants = constants;
-	}
-	
+		
 	/**
 	 * Select a production rule for a symbol of the grammar.
 	 * 

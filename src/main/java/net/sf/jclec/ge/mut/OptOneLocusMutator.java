@@ -52,7 +52,9 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		// Flip selected point
 		flip(mgenome, mp);
 		mutant.setGenotype(mgenome);
+		//System.out.println("constantes mutante:"+mutant.getConstants()[0] + " " + mutant.getConstants()[1] + " " +mutant.getConstants()[2] + " " +mutant.getConstants()[3]);
 		GEIndividual optimizado = (GEIndividual) optimizer.optimize(mutant);
+		//System.out.println("constantes optimizado:"+optimizado.getConstants()[0] + " " + optimizado.getConstants()[1] + " " +optimizado.getConstants()[2] + " " +optimizado.getConstants()[3]);
 		// Returns mutant
 		sonsBuffer.add(optimizado);
 	}

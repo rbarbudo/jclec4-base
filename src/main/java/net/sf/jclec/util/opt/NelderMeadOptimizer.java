@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import net.sf.jclec.IConfigure;
 import net.sf.jclec.IIndividual;
 import net.sf.jclec.ISystem;
+import net.sf.jclec.exprtree.Constant;
 import net.sf.jclec.ge.GEIndividual;
-import net.sf.jclec.ge.GEIndividualSpecies;
 import net.sf.jclec.ge.GESpecies;
 import net.sf.jclec.ISpecies;
 import net.sf.jclec.IPopulation;
@@ -16,7 +16,9 @@ import net.sf.jclec.util.range.IRange;
 import net.sf.jclec.util.range.Interval;
 
 import net.sf.jclec.selector.BettersSelector;
-
+import net.sf.jclec.syntaxtree.SyntaxTree;
+import net.sf.jclec.syntaxtree.SyntaxTreeNode;
+import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.realarray.RealArraySpecies;
 import net.sf.jclec.realarray.RealArrayIndividual;
 
@@ -151,12 +153,17 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		if (spc instanceof RealArraySpecies)
 			((RealArrayIndividual) ind).setGenotype(realArray);
 		if(spc instanceof GESpecies) {
-			// TODO
-			//((GEIndividual) ind).setConstants(realArray);
-		
 			
+			SyntaxTree phenotype = ((GEIndividual)ind).getPhenotype();
 			
-			
+			for (int i=0; i<phenotype.size(); i++) {
+				SyntaxTreeNode node = phenotype.getNode(i);
+				if(node.getSymbol().equals("cte")) {
+					TerminalNode tNode = (TerminalNode) node;
+					((Constant)tNode.getCode()).setValue(realArray[0]);
+					phenotype.setNode(tNode, i);
+				}
+			}
 		}
 		else
 			throw new IllegalArgumentException("Species doesn't expected");
@@ -169,9 +176,21 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		if (spc instanceof RealArraySpecies)
 			realArray = ((RealArrayIndividual) ind).getGenotype();
 		if(spc instanceof GESpecies) {
-			// TODO
-			//realArray = ((GEIndividual) ind).getConstants();
 			
+			ArrayList <Double> lReal = new ArrayList<Double>();
+			SyntaxTree phenotype = ((GEIndividual)ind).getPhenotype();
+			
+			for (int i=0; i<phenotype.size(); i++) {
+				SyntaxTreeNode node = phenotype.getNode(i);
+				if(node.getSymbol().equals("cte")) {
+					TerminalNode tNode = (TerminalNode) node;
+					lReal.add(((Constant)tNode.getCode()).getValue());
+				}
+			}
+			realArray = new double[lReal.size()];
+			for(int i=0; i<realArray.length; i++) {
+				realArray[i] = lReal.get(i);
+			}
 		}
 		else
 			throw new IllegalArgumentException("Species doesn't expected");
@@ -221,9 +240,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			schema = ((RealArraySpecies) spc).getGenotypeSchema();
 		}
 		if(spc instanceof GESpecies) {
-			// TODO
-			//schema = ((GESpecies) spc).getGenotypeSchema().getIndividualConstants();
-			
+			schema = ((GESpecies) spc).getGenotypeSchema().getIndividualConstants();
 		}
 		else {
 			throw new IllegalArgumentException("Species doesn't expected");
@@ -266,8 +283,17 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			realArray[i] =  valorCentroide[i] + factor*(valorCentroide[i]- getRealArray(indRespecto)[i]);
 			
 			//Check the limits of the interval
-			a = ((Interval) schema[i]).getLeft();
-			b = ((Interval) schema[i]).getRight();
+			if(spc instanceof RealArraySpecies) {
+				a = ((Interval) schema[i]).getLeft();
+				b = ((Interval) schema[i]).getRight();
+			}
+			if(spc instanceof GESpecies) {
+				a = ((Interval) schema[0]).getLeft();
+				b = ((Interval) schema[0]).getRight();
+			}
+			else {
+				throw new IllegalArgumentException("Species doesn't expected");
+			}
 	
 			extremoInferior = Math.min(a,b);
 			extremoSuperior = Math.max(a,b);
@@ -287,6 +313,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		List<IIndividual> result = new ArrayList<IIndividual>();
 	
 		List<IIndividual> aux = bettersSelector.select(source, source.size());
+		
 		
 		//Add the worst individual
 		result.add(aux.get(source.size()-1));
@@ -336,16 +363,24 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		double [] realArray = new double[longitud];
 		
 		for(int i=0; i<longitud; i++){
-			
+						
 			IIndividual nuevaSolucion = (IIndividual) solucionInicial.copy();
 			//realArray = nuevaSolucion.getGenotype();
 			realArray = getRealArray(nuevaSolucion);
 			
 			//Assign new values to the solution
-			a = ((Interval) schema[i]).getLeft();
-			b = ((Interval) schema[i]).getRight();
-			
-			
+			if(spc instanceof RealArraySpecies) {
+				a = ((Interval) schema[i]).getLeft();
+				b = ((Interval) schema[i]).getRight();
+			}
+			if(spc instanceof GESpecies) {
+				a = ((Interval) schema[0]).getLeft();
+				b = ((Interval) schema[0]).getRight();
+			}
+			else {
+				throw new IllegalArgumentException("Species doesn't expected");
+			}
+					
 			dif = Math.abs(a-b);
 						
 			realArray[i] += 0.1*dif;
@@ -388,100 +423,107 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		//Obtain the lenght of the individuals
 		//int length = ind.getGenotype().length;
 		int length = getRealArray(ind).length;
-		double [] centroideValue = new double[length];
-
-		for(int i=0; i<length; i++)
-		{
-			centroideValue[i] = 0.0;
-		}
 		
-		//Generate new solutions
-		solutions = generateSolutions(ind, length);
-		
-		extremeSolutions = obtainExtremeSolutions(solutions, length);
-		
-		// 0 - It is the worst solution
-		// 1 - It is the second worst solution
-		// 2 - It is the best solution
-		
-		for(int i=0; i<maxIterations; i++)
-		{
-			extremeSolutions = obtainExtremeSolutions(solutions, length);
-		
-			calculateCentroide(solutions, extremeSolutions.get(0), centroideValue, length);
-		
+		if(length > 0) {
 			
-			//Change the solution by means of reflection process
-			move(reflection, extremeSolutions.get(0), length, reflectionFactor, centroideValue);
-			evaluator.evaluate(lreflection);
-			
-			//If the new solution is better than the best solution, Apply expansion process
-			if(evaluator.getComparator().compare(extremeSolutions.get(2).getFitness(),reflection.getFitness()) == -1)
+			double [] centroideValue = new double[length];
+	
+			for(int i=0; i<length; i++)
 			{
+				centroideValue[i] = 0.0;
+			}
+			
+			//Generate new solutions
+			solutions = generateSolutions(ind, length);
+						
+			extremeSolutions = obtainExtremeSolutions(solutions, length);
+			
+			// 0 - It is the worst solution
+			// 1 - It is the second worst solution
+			// 2 - It is the best solution
+			
+			for(int i=0; i<maxIterations; i++)
+			{
+				extremeSolutions = obtainExtremeSolutions(solutions, length);
+			
+				calculateCentroide(solutions, extremeSolutions.get(0), centroideValue, length);
+			
 				
-				move(extension, reflection, length, expansionFactor, centroideValue);
+				//Change the solution by means of reflection process
+				move(reflection, extremeSolutions.get(0), length, reflectionFactor, centroideValue);
+				evaluator.evaluate(lreflection);
 				
-				evaluator.evaluate(lextension);
-				
-				if(evaluator.getComparator().compare(reflection.getFitness(),extension.getFitness()) == -1){
-					//extremeSolutions.get(0).setGenotype(extension.getGenotype());
-					setRealArray(extremeSolutions.get(0), getRealArray(extension));
-					extremeSolutions.get(0).setFitness(extension.getFitness());
+				//If the new solution is better than the best solution, Apply expansion process
+				if(evaluator.getComparator().compare(extremeSolutions.get(2).getFitness(),reflection.getFitness()) == -1)
+				{
+					
+					move(extension, reflection, length, expansionFactor, centroideValue);
+					
+					evaluator.evaluate(lextension);
+					
+					if(evaluator.getComparator().compare(reflection.getFitness(),extension.getFitness()) == -1){
+						//extremeSolutions.get(0).setGenotype(extension.getGenotype());
+						setRealArray(extremeSolutions.get(0), getRealArray(extension));
+						extremeSolutions.get(0).setFitness(extension.getFitness());
+						
+					}
+					else
+					{
+						//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
+						setRealArray(extremeSolutions.get(0), getRealArray(reflection));
+						extremeSolutions.get(0).setFitness( reflection.getFitness());
+					
+					}
 					
 				}
-				else
-				{
-					//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
+				//If the new solutions is better than the second worst solution, add the new solution
+				else if(evaluator.getComparator().compare(reflection.getFitness(),extremeSolutions.get(1).getFitness()) == 1){
+					
+					//extremeSolutions.get(0).setGenotype(reflection.getGenotype());
 					setRealArray(extremeSolutions.get(0), getRealArray(reflection));
-					extremeSolutions.get(0).setFitness( reflection.getFitness());
-				
+					extremeSolutions.get(0).setFitness(reflection.getFitness());
 				}
 				
-			}
-			//If the new solutions is better than the second worst solution, add the new solution
-			else if(evaluator.getComparator().compare(reflection.getFitness(),extremeSolutions.get(1).getFitness()) == 1){
-				
-				//extremeSolutions.get(0).setGenotype(reflection.getGenotype());
-				setRealArray(extremeSolutions.get(0), getRealArray(reflection));
-				extremeSolutions.get(0).setFitness(reflection.getFitness());
-			}
-			
-			else
-			{
-				//If the new solution is better than the worst solution, add the new solution
-				if(evaluator.getComparator().compare(reflection.getFitness(),extremeSolutions.get(0).getFitness()) == 1){
-					//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
-					setRealArray(extremeSolutions.get(0), getRealArray(reflection));
-					extremeSolutions.get(0).setFitness( reflection.getFitness());
-				
-				}
 				else
 				{
-					//Apply contraction process
-					move(contraction, extremeSolutions.get(0), length, contractionFactor, centroideValue);
-					evaluator.evaluate(lcontraction);
-				
-					//If the new solution is better than the worst solution, add the new solution 
-					if(evaluator.getComparator().compare(contraction.getFitness(),extremeSolutions.get(0).getFitness()) == 1)
-					{
-						//extremeSolutions.get(0).setGenotype( contraction.getGenotype());
-						setRealArray(extremeSolutions.get(0), getRealArray(contraction));
-						extremeSolutions.get(0).setFitness( contraction.getFitness());
+					//If the new solution is better than the worst solution, add the new solution
+					if(evaluator.getComparator().compare(reflection.getFitness(),extremeSolutions.get(0).getFitness()) == 1){
+						//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
+						setRealArray(extremeSolutions.get(0), getRealArray(reflection));
+						extremeSolutions.get(0).setFitness( reflection.getFitness());
 					
 					}
 					else
-						// Restart solutions
-						restart(solutions, extremeSolutions.get(0), length);
-				}
+					{
+						//Apply contraction process
+						move(contraction, extremeSolutions.get(0), length, contractionFactor, centroideValue);
+						evaluator.evaluate(lcontraction);
 					
-			}			
-			//
-			for(int j=0; j<length; j++)	centroideValue[j] = 0.0;					
-		}
-		
-		extremeSolutions = obtainExtremeSolutions(solutions, length);				
+						//If the new solution is better than the worst solution, add the new solution 
+						if(evaluator.getComparator().compare(contraction.getFitness(),extremeSolutions.get(0).getFitness()) == 1)
+						{
+							//extremeSolutions.get(0).setGenotype( contraction.getGenotype());
+							setRealArray(extremeSolutions.get(0), getRealArray(contraction));
+							extremeSolutions.get(0).setFitness( contraction.getFitness());
+						
+						}
+						else
+							// Restart solutions
+							restart(solutions, extremeSolutions.get(0), length);
+					}
+						
+				}			
+				//
+				for(int j=0; j<length; j++)	centroideValue[j] = 0.0;					
+			}
 			
-		return extremeSolutions.get(2);
+			extremeSolutions = obtainExtremeSolutions(solutions, length);				
+				
+			return extremeSolutions.get(2);
+		}
+		else {
+			return ind;
+		}
 	}	
 }
 

@@ -10,10 +10,7 @@ import net.sf.jclec.ge.GEIndividual;
  */
 
 public class GEFullCreator extends GECreator 
-{
-	
-	// TODO Comentar problema con individuos invalidos
-	
+{	
 	/////////////////////////////////////////////////////////////////
 	// --------------------------------------- Serialization constant
 	/////////////////////////////////////////////////////////////////
@@ -77,6 +74,5 @@ public class GEFullCreator extends GECreator
 				
 		schema.full(newInd, rootSymbol, 0, 0);
 		return newInd;
-	}
-	
+	}	
 }

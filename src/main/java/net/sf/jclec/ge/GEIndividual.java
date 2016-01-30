@@ -45,16 +45,6 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	// ------------------------------------------------- Constructors
 	/////////////////////////////////////////////////////////////////
 	
-//	/*
-//	/**
-//	 * Empty constructor
-//	 */
-//	
-//	public GEIndividual() 
-//	{
-//		super();
-//	}
-
 	/**
 	 * Constructor that sets individual genotype
 	 * 
@@ -80,7 +70,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	}
 
 	/**
-	 * Constructor that sets individual genotype, constants, and phenotype
+	 * Constructor that sets individual genotype, constants and phenotype
 	 * 
 	 * @param genotype Individual genotype
 	 * @param phenotype Individual phenotype
@@ -110,34 +100,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 		setConstants(constants);
 		setFitness(fitness);
 	}
-	
-//	/**
-//	 * Constructor that sets individual genotype and phenotype
-//	 * 
-//	 * @param genotype Individual genotype
-//	 * @param phenotype Individual phenotype
-//	 */
-//	
-//	public GEIndividual(int[] genotype, SyntaxTree phenotype) 
-//	{
-//		super(genotype);
-//		setPhenotype(phenotype);
-//	}
-	
-//	/**
-//	 * Constructor that sets individual genotype, phenotype and fitness
-//	 * 
-//	 * @param genotype Individual genotype
-//	 * @param phenotype Individual phenotype
-//	 * @param fitness  Individual fitness
-//	 */
-//	
-//	public GEIndividual(int[] genotype, SyntaxTree phenotype, IFitness fitness) 
-//	{
-//		super(genotype, fitness);
-//		setPhenotype(phenotype);
-//	}
-	
+		
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
@@ -192,16 +155,14 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	
 	public IIndividual copy()
 	{
-		// Genotype length
+		// Genotype and constants length
 		int gl = genotype.length;
-		
-		// Constant length
 		int cl = constants.length;
 		
 		// Allocate a copy of genotype, phenotype and constants
 		int [] gother = new int[gl];
-		double [] cother = new double[cl];
 		SyntaxTree pother = new SyntaxTree();
+		double [] cother = new double[cl];
 		
 		// Copy genotype, constants and phenotype
 		System.arraycopy(genotype, 0, gother, 0, gl);
@@ -209,12 +170,10 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 		pother = phenotype.copy();
 		
 		// Create new individuals, then return it
-		if (fitness != null) {
+		if (fitness != null)
 			return new GEIndividual(gother, pother, cother, fitness.copy());			
-		}
-		else {
+		else
 			return new GEIndividual(gother, pother, cother);			
-		}
 	}
 	
 	/**
@@ -255,9 +214,8 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 			eb.append(fitness, iaother.fitness);
 			return eb.isEquals();
 		}
-		else {
+		else
 			return false;
-		}
 	}
 
 	@Override

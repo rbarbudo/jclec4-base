@@ -45,7 +45,7 @@ public class GESchema implements JCLEC
 	
 	protected String rootSymbol;
 	
-	/** Maximum of depth per tree */
+	/** Maximum depth per tree */
 	
 	protected int maxDepthSize;
 	
@@ -140,7 +140,6 @@ public class GESchema implements JCLEC
 		setNonTerminalsMap();
 		// Set minDepthSize map
 		setMinDepthMap();
-		System.out.println(minDepthMap);
 	}
 
 	/**
@@ -177,7 +176,7 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get the array of nonterminal nodes
+	 * Get the array of non terminal nodes
 	 * 
 	 * @return nonterminal nodes
 	 */
@@ -241,7 +240,7 @@ public class GESchema implements JCLEC
 	/**
 	 * Gets the minimum depth size for a given symbol
 	 * 
-	 * @param gumbol which we need to get minimum depth size
+	 * @param symbol which we need to get minimum depth size
 	 * 
 	 * @return minimum depth size
 	 */
@@ -268,7 +267,6 @@ public class GESchema implements JCLEC
 	
 	public void setMinDepthSize(NonTerminalNode production, int minDepthSize)
 	{
-		System.out.println("he entrado");
 		minDepthMap.put(production, minDepthSize);
 	}
 	
@@ -356,11 +354,11 @@ public class GESchema implements JCLEC
 	/**
 	 * Select a production rule for a symbol of the grammar.
 	 * 
-	 * @param symbol  Symbol to expand
+	 * @param symbol Symbol to expand
 	 * @param genotype Genotype of an individual
 	 * @param posGenotype Reading position of the genotype
 	 * 
-	 * @return A production rule for  the given symbol.
+	 * @return A production rule for the given symbol.
 	 */	
 	
 	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype)
@@ -430,7 +428,7 @@ public class GESchema implements JCLEC
 		// Variable used to control if we are using recursiveProductions or not
 	    boolean recursiveRules = false;
 		
-	  // Iterate through the different rule productions
+	    // Iterate through the different rule productions
 		for(NonTerminalNode rule : prodRules)
 		{
 			if(depth + getMinDepthSize(rule) < this.maxDepthSize)
@@ -441,9 +439,7 @@ public class GESchema implements JCLEC
 					possibleRules.clear();
 				}
 				if(!recursiveRules || (recursiveRules && rule.isRecursive()))
-				{
 					possibleRules.add(i);
-				}
 			}
 			i++;
 		}
@@ -461,7 +457,7 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get the minimum depth size for a given symbol
+	 * Get the minimum depth size for a given symbol with all its productions
 	 * 
 	 * @param prodRule for which we need to know the minimum depth size
 	 * @param visitedRules Rules which we have already visited
@@ -549,7 +545,6 @@ public class GESchema implements JCLEC
 	
 	public void searchDerivationDissimilarity(int[] p0genotype, int[] p1genotype, int [] posGenotype, int endPosition, String symbol) 
 	{
-		// TODO Revisar exahustivamente que realmente funcione bien
 		NonTerminalNode prod0 = new NonTerminalNode();
 		NonTerminalNode prod1 = new NonTerminalNode();
 		
@@ -594,7 +589,7 @@ public class GESchema implements JCLEC
 			
 			// Increment position of genotype going back if it's necessary
 			posGenotype++;
-			if(posGenotype==ind.getGenotype().length-1)
+			if(posGenotype == ind.getGenotype().length-1)
 				posGenotype = 0;
 			if (selectedProduction != null){
 				ind.getPhenotype().addNode(selectedProduction);
@@ -631,7 +626,7 @@ public class GESchema implements JCLEC
 			
 			// Increment position of genotype going back if it's necessary
 			posGenotype++;
-			if(posGenotype==ind.getGenotype().length-1)
+			if(posGenotype == ind.getGenotype().length-1)
 				posGenotype = 0;
 			if (selectedProduction != null){
 				ind.getPhenotype().addNode(selectedProduction);

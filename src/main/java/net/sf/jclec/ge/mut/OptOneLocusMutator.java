@@ -10,6 +10,13 @@ import net.sf.jclec.ITool;
 import net.sf.jclec.ge.GEIndividual;
 import net.sf.jclec.util.opt.IOptimizer;
 
+/**
+ * One locus mutation applied to GE. In addition, this mutatot applied the 
+ * Nelder-Mead algorithm to the constants optimization
+ * 
+ * @author Rafael Barbudo Lunar
+ */
+
 public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 {
 	/////////////////////////////////////////////////////////////////
@@ -32,11 +39,11 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
 	
-	/*
-	 *  Equivalente al metodo mutateNext del original pero incluyendo además
-	 *  optimizacion con Nelder Mead
+	/**
+	 * {@inheritDoc}
 	 */
 	
+	@Override
 	protected void mutateNext() 
 	{
 		// Genome length
@@ -52,15 +59,19 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		// Flip selected point
 		flip(mgenome, mp);
 		mutant.setGenotype(mgenome);
-		//System.out.println("constantes mutante:"+mutant.getConstants()[0] + " " + mutant.getConstants()[1] + " " +mutant.getConstants()[2] + " " +mutant.getConstants()[3]);
-		GEIndividual optimizado = (GEIndividual) optimizer.optimize(mutant);
-		//System.out.println("constantes optimizado:"+optimizado.getConstants()[0] + " " + optimizado.getConstants()[1] + " " +optimizado.getConstants()[2] + " " +optimizado.getConstants()[3]);
+		// Optimize individual
+		GEIndividual optimized = (GEIndividual) optimizer.optimize(mutant);
 		// Returns mutant
-		sonsBuffer.add(optimizado);
+		sonsBuffer.add(optimized);
 	}
 	
+	/**
+	 * Configuration method for the optimizer
+	 * 
+	 * @param settings Set of parameters needed to configure the optimizer
+	 */
+	
 	@SuppressWarnings("unchecked")
-	@Override
 	public void configure(Configuration configuration) {
 
 		try {
@@ -88,6 +99,12 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 			throw new ConfigurationRuntimeException("Problems creating an instance of optimizer", e);
 		}	
 	}
+
+	/**
+	 * Contextualization method
+	 * 
+	 * @param context Actual context of the execution
+	 */
 	
 	public final void contextualize(ISystem context)
 	{
@@ -102,6 +119,5 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		else {
 			throw new IllegalArgumentException("This object uses a population as execution context");
 		}
-	}
-	
+	}	
 }

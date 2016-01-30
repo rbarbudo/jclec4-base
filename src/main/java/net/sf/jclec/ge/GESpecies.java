@@ -40,9 +40,7 @@ public abstract class GESpecies implements ISpecies
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
-	
-	// Factory method
-	
+		
 	/**
 	 * Factory method.
 	 * 
@@ -53,12 +51,10 @@ public abstract class GESpecies implements ISpecies
 	
 	public abstract GEIndividual createIndividual(int [] genotype);
 
-	// Genotype information
-
 	/**
 	 * Informs about individual genotype length.
 	 * 
-	 * @return getGenotypeSchema().indGenotypeSchema.length
+	 * @return genotype length
 	 */
 	
 	public int getGenotypeLength()
@@ -76,6 +72,12 @@ public abstract class GESpecies implements ISpecies
 	{
 		return genotypeSchema;
 	}
+	
+	/**
+	 * Set the provider used in the creation of new individuals
+	 * 
+	 * @param provider Individual provider
+	 */
 	
 	public void setProvider(GECreator provider) 
 	{

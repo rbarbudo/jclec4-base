@@ -10,11 +10,9 @@ import net.sf.jclec.base.AbstractRecombinator;
  * 
  * @author Rafael Barbudo Lunar
  */
+
 public abstract class GERecombinator extends AbstractRecombinator 
-{
-	// TODO Ahora mismo esta muy enfocado a hacer los cruces sobre el array de enteros
-	// Susceptible de cambios cuando se implementen nuevos operadores que tengan en cuenta los fenotipos
-	
+{	
 	/////////////////////////////////////////////////////////////////
 	// --------------------------------------- Serialization constant
 	/////////////////////////////////////////////////////////////////
@@ -30,6 +28,8 @@ public abstract class GERecombinator extends AbstractRecombinator
 	/** Individual species */
 	
 	protected GESpecies species;
+	
+	/** Individual provider */	
 	
 	protected GECreator provider;
 	
@@ -86,14 +86,12 @@ public abstract class GERecombinator extends AbstractRecombinator
 		if (spc instanceof GESpecies) {
 			this.species = (GESpecies) spc;
 		}
-		else {
+		else
 			throw new IllegalStateException("Invalid population species");
-		}
 		
 		// Sets individual provider
 		IProvider provider = ((IProvider)((PopulationAlgorithm) context).getProvider());
 		if(provider instanceof GECreator)
 			((GESpecies)spc).setProvider((GECreator)provider);
 	}
-
 }

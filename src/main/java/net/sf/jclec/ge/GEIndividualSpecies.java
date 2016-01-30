@@ -55,7 +55,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	}
 	
 	/////////////////////////////////////////////////////////////////
-	// ------------------------------------------- Setting properties
+	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
 
 	// Setting properties
@@ -99,7 +99,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	 * @param individualArray Individual array schema
 	 */
 	
-	private void setIndividualArrayGenotype(IIntegerSet[] individualArray) 
+	public void setIndividualArrayGenotype(IIntegerSet[] individualArray) 
 	{
 		genotypeSchema.setIndividualArrayGenotype(individualArray);
 	}
@@ -110,7 +110,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	 * @param constants Individual array schema
 	 */
 	
-	private void setIndividualConstant(IRange[] constants) 
+	public void setIndividualConstant(IRange[] constants) 
 	{
 		genotypeSchema.setIndividualConstants(constants);
 	}
@@ -125,10 +125,19 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	{
 		this.genotypeSchema = genotypeSchema;
 	}
-
-	/////////////////////////////////////////////////////////////////
-	// ----------------------------------------------- Public methods
-	/////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Set the maximum depth size for this schema.
+	 * 
+	 * @param maxDpthSize Maximum depth
+	 */
+	
+	private void setMaxDepthSize(int maxDepthSize) 
+	{
+		genotypeSchema.setMaxDepthSize(maxDepthSize);	
+	}
+	
+	// Configuration and creation methods
 	
 	/**
 	 * {@inheritDoc}
@@ -148,17 +157,6 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	}
 	
 	/**
-	 * Set the maximum depth size for this schema.
-	 * 
-	 * @param maxDpthSize Maximum depth
-	 */
-	
-	private void setMaxDepthSize(int maxDepthSize) 
-	{
-		genotypeSchema.setMaxDepthSize(maxDepthSize);	
-	}
-	
-	/**
 	 * Configuration method.
 	 * 
 	 * @param settings Set of parameters needed to configure the species
@@ -169,7 +167,9 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		GrammarParser gp = new GrammarParser();
 		TerminalNode [] terminals;
 		
+		// Try to get the terminals, non terminals and root nodes
 		try {
+			
 			// Get the file where the grammar is located
 			String bnfFile = settings.getString("grammar-file");
 			// Get the file where the code of the terminal nodes is located
@@ -177,7 +177,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			
 			// Get all the terminals node
 			terminals = gp.getTerminals(bnfFile);
-			// Set the code to the list of terminals and set them to the genotype
+			// Set the code to the list of terminals and set them to the schema
 			terminals = gp.setTerminalsCode(codeFile, terminals);
 			setTerminals(terminals);
 			// Get the non terminal nodes and set to the genotype
@@ -190,13 +190,12 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			System.exit(0);
 		}
 		
-		// Constant length
+		// Constants length
 		int constantLength = settings.getList("constant-schema.locus[@type]").size();
-		// Genotype schema
+		// Constants schema
 		IRange [] constants = new IRange[constantLength];
 		// Set constants schema components
-		for(int i=0; i<constantLength; i++)
-		{
+		for(int i=0; i<constantLength; i++) {
 			// Get component classname
 			String componentClassname = 
 					settings.getString("constant-schema.locus("+i+")[@type]");
@@ -212,7 +211,6 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 						(settings.subset("constant-schema.locus("+i+")"));
 				}
 			}
-			
 			catch(ClassNotFoundException e) {
 				e.printStackTrace();
 				System.exit(0);
@@ -234,8 +232,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		// Genotype schema
 		IIntegerSet [] individualArray = new IIntegerSet[genotypeLength];
 		// Set genotype schema components
-		for (int i=0; i<genotypeLength; i++) 
-		{
+		for (int i=0; i<genotypeLength; i++) {
 			// Get component classname
 			String componentClassname = 
 					settings.getString("genotype-schema.locus("+i+")[@type]");
@@ -268,7 +265,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		// Assign genotype schema
 		setIndividualArrayGenotype(individualArray);
 		
-		// Get max-tree-depth
+		// Get and set max-tree-depth
 		int maxDepthSize = settings.getInt("max-depth-size");
 		setMaxDepthSize(maxDepthSize);
 	}
@@ -299,8 +296,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			eb.append(this.genotypeSchema, iaoth.genotypeSchema);
 			return eb.isEquals();
 		}
-		else {
+		else
 			return false;
-		}
 	}	
 }

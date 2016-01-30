@@ -71,10 +71,8 @@ public class GEGrowCreator extends GECreator
 		}
 		else
 			newInd = new GEIndividual(genotype);
-		
 				
 		schema.grow(newInd, rootSymbol, 0, 0);
 		return newInd;
 	}
-	
 }

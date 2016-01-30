@@ -91,7 +91,6 @@ public class FLHomologousCrossover extends GERecombinator
 	
 	/**
 	 * {@inheritDoc}
-	 * 
 	 */
 	
 	@Override

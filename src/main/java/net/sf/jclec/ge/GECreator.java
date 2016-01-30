@@ -87,7 +87,7 @@ public abstract class GECreator extends AbstractCreator
 	}
 	
 	/**
-	 * Create a double [] constans, filling it randomly
+	 * Create a double [] constants, filling it randomly
 	 */
 	
 	protected final double [] createConstants()
@@ -113,6 +113,5 @@ public abstract class GECreator extends AbstractCreator
 		else {
 			throw new IllegalStateException("Illegal species in context");
 		}
-	}
-	
+	}	
 }

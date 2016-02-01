@@ -10,6 +10,7 @@ import java.util.Set;
 import net.sf.jclec.IPopulation;
 import net.sf.jclec.JCLEC;
 import net.sf.jclec.exprtree.Constant;
+import net.sf.jclec.exprtree.IPrimitive;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.intset.IIntegerSet;
@@ -585,14 +586,16 @@ public class GESchema implements JCLEC
 	public int grow(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context)
 	{
 		if (isTerminal(symbol)) {
-			TerminalNode newTerm = getTerminal(symbol);
-			if(newTerm.getCode() instanceof Constant) {
-				((Constant)newTerm.getCode()).contextualize(context);
+			if(symbol.equals("cte")) {
+				Constant code = new Constant();
+				code.contextualize(context);
+				ind.getPhenotype().addNode(new TerminalNode(symbol,code));
 			}
-			ind.getPhenotype().addNode(newTerm);
+			else {
+				ind.getPhenotype().addNode(getTerminal(symbol));
+			}
 		}
-		else
-		{	
+		else {	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
 			selectedProduction = selectProductionGrow(symbol, ind.getGenotype(), posGenotype, depth);
 			
@@ -605,8 +608,7 @@ public class GESchema implements JCLEC
 				for(int i=0; i<selectedProduction.getProduction().length; i++)
 					posGenotype = grow(ind, selectedProduction.getProduction()[i], posGenotype, depth+1, context);
 			}
-			else
-			{
+			else {
 				ind.setFeasibility(false);
 				return posGenotype;
 			}
@@ -627,14 +629,16 @@ public class GESchema implements JCLEC
 	public int full(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context) 
 	{
 		if (isTerminal(symbol)) {
-			TerminalNode newTerm = getTerminal(symbol);
-			if(newTerm.getCode() instanceof Constant) {
-				((Constant)newTerm.getCode()).contextualize(context);
+			if(symbol.equals("cte")) {
+				Constant code = new Constant();
+				code.contextualize(context);
+				ind.getPhenotype().addNode(new TerminalNode(symbol,code));
 			}
-			ind.getPhenotype().addNode(getTerminal(symbol));
+			else {
+				ind.getPhenotype().addNode(getTerminal(symbol));
+			}
 		}
-		else
-		{	
+		else {	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
 			selectedProduction = selectProductionFull(symbol, ind.getGenotype(), posGenotype, depth);
 			
@@ -647,8 +651,7 @@ public class GESchema implements JCLEC
 				for(int i=0; i<selectedProduction.getProduction().length; i++)
 					posGenotype = full(ind, selectedProduction.getProduction()[i], posGenotype, depth+1, context);
 			}
-			else
-			{
+			else {
 				ind.setFeasibility(false);
 				return posGenotype;
 			}

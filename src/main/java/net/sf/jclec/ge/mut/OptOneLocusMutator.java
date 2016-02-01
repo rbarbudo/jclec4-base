@@ -7,7 +7,11 @@ import net.sf.jclec.IConfigure;
 import net.sf.jclec.IPopulation;
 import net.sf.jclec.ISystem;
 import net.sf.jclec.ITool;
+import net.sf.jclec.exprtree.Constant;
 import net.sf.jclec.ge.GEIndividual;
+import net.sf.jclec.syntaxtree.SyntaxTree;
+import net.sf.jclec.syntaxtree.SyntaxTreeNode;
+import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.opt.IOptimizer;
 
 /**
@@ -58,7 +62,24 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		// Flip selected point
 		flip(mgenome, mp);
 		mutant.setGenotype(mgenome);
+		
+		/*SyntaxTree phenotype = mutant.getPhenotype();
+		System.out.println("antes de optimizar");
+		for(int i=0; i<phenotype.size(); i++)
+			if(phenotype.getNode(i).getSymbol().equals("cte"))
+				System.out.print(((Constant)((TerminalNode)phenotype.getNode(i)).getCode()).getValue()+" ");
+		System.out.println();*/
+		
+		// Optimize individual
 		GEIndividual optimizado = (GEIndividual) optimizer.optimize(mutant);
+		
+		/*phenotype = optimizado.getPhenotype();
+		System.out.println("despues de optimizar");
+		for(int i=0; i<phenotype.size(); i++)
+			if(phenotype.getNode(i).getSymbol().equals("cte"))
+				System.out.print(((Constant)((TerminalNode)phenotype.getNode(i)).getCode()).getValue()+" ");
+		System.out.println();*/
+		
 		// Returns mutant
 		sonsBuffer.add(optimizado);
 	}

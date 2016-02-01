@@ -42,6 +42,10 @@ public class Constant extends AbstractPrimitive implements ITool
 	
 	protected IRange schema;
 	
+	/** Context */
+	
+	protected ISystem context;
+	
 	/////////////////////////////////////////////////////////////////
 	// ------------------------------------------------- Constructors
 	/////////////////////////////////////////////////////////////////
@@ -85,13 +89,19 @@ public class Constant extends AbstractPrimitive implements ITool
 	{
 		Constant cNew = new Constant();
 		cNew.value = new Double(this.value);
+		cNew.context = this.context;
+		cNew.randgen = this.randgen;
+		cNew.schema = this.schema;
+		
 		return cNew;
 	}
 
 	@Override
 	public IPrimitive instance() 
 	{
-		return new Constant();
+		Constant cNew = new Constant();
+		cNew.contextualize(context);
+		return cNew;
 	}
 	
 	public String toString()

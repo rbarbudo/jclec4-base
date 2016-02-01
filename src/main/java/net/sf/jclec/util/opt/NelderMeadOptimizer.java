@@ -7,6 +7,7 @@ import net.sf.jclec.IConfigure;
 import net.sf.jclec.IIndividual;
 import net.sf.jclec.ISystem;
 import net.sf.jclec.exprtree.Constant;
+import net.sf.jclec.exprtree.IPrimitive;
 import net.sf.jclec.ge.GEIndividual;
 import net.sf.jclec.ge.GESpecies;
 import net.sf.jclec.ISpecies;
@@ -153,15 +154,16 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		if (spc instanceof RealArraySpecies)
 			((RealArrayIndividual) ind).setGenotype(realArray);
 		if(spc instanceof GESpecies) {
-			
-			SyntaxTree phenotype = ((GEIndividual)ind).getPhenotype();
-			
+			int index = 0;
+			SyntaxTree phenotype = ((GEIndividual)ind).getPhenotype();					
 			for (int i=0; i<phenotype.size(); i++) {
 				SyntaxTreeNode node = phenotype.getNode(i);
-				if(node.getSymbol().equals("cte")) {
-					TerminalNode tNode = (TerminalNode) node;
-					((Constant)tNode.getCode()).setValue(realArray[0]);
-					phenotype.setNode(tNode, i);
+				if(node instanceof TerminalNode) {
+					IPrimitive code = ((TerminalNode) node).getCode();
+					if(code instanceof Constant) {
+						((Constant) code).setValue(realArray[index]);
+						index++;
+					}
 				}
 			}
 		}
@@ -518,10 +520,19 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			}
 			
 			extremeSolutions = obtainExtremeSolutions(solutions, length);				
-				
+			
+			/*System.out.print("opt1:");
+			for (int i=0; i< getRealArray(extremeSolutions.get(2)).length; i++) {
+				System.out.print(getRealArray(extremeSolutions.get(2))[i]);
+			}*/
+			
 			return extremeSolutions.get(2);
 		}
 		else {
+			/*System.out.print("opt2:");
+			for (int i=0; i< getRealArray(ind).length; i++) {
+				System.out.print(getRealArray(ind)[i]);
+			}*/
 			return ind;
 		}
 	}	

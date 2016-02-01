@@ -57,8 +57,6 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	/////////////////////////////////////////////////////////////////
 	// ------------------------------------------- Setting properties
 	/////////////////////////////////////////////////////////////////
-
-	// Setting properties
 	
 	/**
 	 * Set the name of the root symbol 
@@ -94,7 +92,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	}
 	
 	/**
-	 * Set the individual array.
+	 * Set the individual array genotype.
 	 * 
 	 * @param individualArray Individual array schema
 	 */
@@ -116,7 +114,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	}
 
 	/**
-	 * Set the individual constant array.
+	 * Set the individual constant array schema.
 	 * 
 	 * @param constants Individual array schema
 	 */
@@ -153,7 +151,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	 * @param maxDpthSize Maximum depth
 	 */
 	
-	private void setMaxDepthSize(int maxDepthSize) 
+	public void setMaxDepthSize(int maxDepthSize) 
 	{
 		genotypeSchema.setMaxDepthSize(maxDepthSize);	
 	}
@@ -192,7 +190,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		
 		// Constant length
 		int constantLength = settings.getList("constant-schema.locus[@type]").size();
-		// Genotype schema
+		// Constant schema
 		IRange [] constants = new IRange[constantLength];
 		// Set constants schema components
 		for(int i=0; i<constantLength; i++)
@@ -268,7 +266,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		// Assign genotype schema
 		setIndividualArrayGenotype(individualArray);
 		
-		// Get max-tree-depth
+		// Set max-tree-depth
 		int maxDepthSize = settings.getInt("max-depth-size");
 		setMaxDepthSize(maxDepthSize);
 	}

@@ -47,9 +47,9 @@ public class RampedHalfAndHalf extends GECreator
 		GEIndividual newInd = new GEIndividual(createGenotype());
 		
 		if(randgen.coin())
-			schema.grow(newInd, rootSymbol, 0, 0);
+			schema.grow(newInd, rootSymbol, 0, 0, context);
 		else
-			schema.full(newInd, rootSymbol, 0, 0);
+			schema.full(newInd, rootSymbol, 0, 0, context);
 
 		// Add the new individual
 		createdBuffer.add(newInd);
@@ -91,9 +91,9 @@ public class RampedHalfAndHalf extends GECreator
 			GEIndividual newInd = new GEIndividual(createGenotype());
 			// Map phenotype with grow or full method
 			if(randgen.coin())
-				schema.grow(newInd, rootSymbol, 0, 0);
+				schema.grow(newInd, rootSymbol, 0, 0, context);
 			else
-				schema.full(newInd, rootSymbol, 0, 0);	
+				schema.full(newInd, rootSymbol, 0, 0, context);	
 			//Add the new individual
 			createdBuffer.add(newInd);
 			// Increase the current depth if it's necesary
@@ -115,11 +115,10 @@ public class RampedHalfAndHalf extends GECreator
 		String rootSymbol = schema.getRootSymbol();		
 						
 		if(randgen.coin())
-			schema.grow(newInd, rootSymbol, 0, 0);
+			schema.grow(newInd, rootSymbol, 0, 0, context);
 		else
-			schema.full(newInd, rootSymbol, 0, 0);
+			schema.full(newInd, rootSymbol, 0, 0, context);
 
 		return newInd;	
 	}
-
 }

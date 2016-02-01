@@ -41,16 +41,6 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	// ------------------------------------------------- Constructors
 	/////////////////////////////////////////////////////////////////
 	
-//	/*
-//	/**
-//	 * Empty constructor
-//	 */
-//	
-//	public GEIndividual() 
-//	{
-//		super();
-//	}
-
 	/**
 	 * Constructor that sets individual genotype
 	 * 
@@ -89,33 +79,6 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 		setPhenotype(phenotype);
 		setFitness(fitness);
 	}
-	
-//	/**
-//	 * Constructor that sets individual genotype and phenotype
-//	 * 
-//	 * @param genotype Individual genotype
-//	 * @param phenotype Individual phenotype
-//	 */
-//	
-//	public GEIndividual(int[] genotype, SyntaxTree phenotype) 
-//	{
-//		super(genotype);
-//		setPhenotype(phenotype);
-//	}
-	
-//	/**
-//	 * Constructor that sets individual genotype, phenotype and fitness
-//	 * 
-//	 * @param genotype Individual genotype
-//	 * @param phenotype Individual phenotype
-//	 * @param fitness  Individual fitness
-//	 */
-//	
-//	public GEIndividual(int[] genotype, SyntaxTree phenotype, IFitness fitness) 
-//	{
-//		super(genotype, fitness);
-//		setPhenotype(phenotype);
-//	}
 	
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods

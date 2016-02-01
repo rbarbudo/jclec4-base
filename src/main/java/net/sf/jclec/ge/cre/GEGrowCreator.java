@@ -42,7 +42,7 @@ public class GEGrowCreator extends GECreator
 		String rootSymbol = schema.getRootSymbol();
 		GEIndividual newInd = new GEIndividual(createGenotype());
 			
-		schema.grow(newInd, rootSymbol, 0, 0);
+		schema.grow(newInd, rootSymbol, 0, 0, context);
 		// Add the new individual
 		createdBuffer.add(newInd);
 	}
@@ -57,8 +57,7 @@ public class GEGrowCreator extends GECreator
 		GEIndividual newInd = new GEIndividual(genotype);
 		String rootSymbol = schema.getRootSymbol();
 				
-		schema.grow(newInd, rootSymbol, 0, 0);
+		schema.grow(newInd, rootSymbol, 0, 0, context);
 		return newInd;
-	}
-	
+	}	
 }

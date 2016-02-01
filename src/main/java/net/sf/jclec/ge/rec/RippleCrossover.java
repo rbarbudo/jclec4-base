@@ -88,5 +88,4 @@ public class RippleCrossover extends GERecombinator
 		sonsBuffer.add(species.createIndividual(s0_genome));
 		sonsBuffer.add(species.createIndividual(s1_genome));
 	}
-
 }

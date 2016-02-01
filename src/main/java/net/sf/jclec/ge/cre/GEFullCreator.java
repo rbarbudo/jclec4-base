@@ -10,10 +10,7 @@ import net.sf.jclec.ge.GEIndividual;
  */
 
 public class GEFullCreator extends GECreator 
-{
-	
-	// TODO Comentar problema con individuos invalidos
-	
+{	
 	/////////////////////////////////////////////////////////////////
 	// --------------------------------------- Serialization constant
 	/////////////////////////////////////////////////////////////////
@@ -45,7 +42,7 @@ public class GEFullCreator extends GECreator
 		String rootSymbol = schema.getRootSymbol();
 		GEIndividual newInd = new GEIndividual(createGenotype());
 	
-		schema.full(newInd, rootSymbol, 0, 0);
+		schema.full(newInd, rootSymbol, 0, 0, context);
 		// Add the new individual
 		createdBuffer.add(newInd);	
 	}
@@ -60,8 +57,7 @@ public class GEFullCreator extends GECreator
 		GEIndividual newInd = new GEIndividual(genotype);
 		String rootSymbol = schema.getRootSymbol();
 						
-		schema.full(newInd, rootSymbol, 0, 0);
+		schema.full(newInd, rootSymbol, 0, 0, context);
 		return newInd;
 	}
-	
 }

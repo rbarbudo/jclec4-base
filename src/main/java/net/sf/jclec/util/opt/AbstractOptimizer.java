@@ -109,5 +109,6 @@ public abstract class AbstractOptimizer implements IOptimizer
 	/**
 	 * Individual optimization
 	 */
+	
 	public abstract IIndividual optimize(IIndividual ind);
 }

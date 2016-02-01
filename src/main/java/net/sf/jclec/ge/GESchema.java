@@ -7,7 +7,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.jclec.IPopulation;
 import net.sf.jclec.JCLEC;
+import net.sf.jclec.exprtree.Constant;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.intset.IIntegerSet;
@@ -140,7 +142,6 @@ public class GESchema implements JCLEC
 		setNonTerminalsMap();
 		// Set minDepthSize map
 		setMinDepthMap();
-		System.out.println(minDepthMap);
 	}
 
 	/**
@@ -263,7 +264,6 @@ public class GESchema implements JCLEC
 	 * 
 	 * @param production which we need to set minimum depth size
 	 * @param minDepthSize minimum depth
-	 * 
 	 */
 	
 	public void setMinDepthSize(NonTerminalNode production, int minDepthSize)
@@ -430,7 +430,7 @@ public class GESchema implements JCLEC
 		// Variable used to control if we are using recursiveProductions or not
 	    boolean recursiveRules = false;
 		
-	  // Iterate through the different rule productions
+	    // Iterate through the different rule productions
 		for(NonTerminalNode rule : prodRules)
 		{
 			if(depth + getMinDepthSize(rule) < this.maxDepthSize)
@@ -549,7 +549,6 @@ public class GESchema implements JCLEC
 	
 	public void searchDerivationDissimilarity(int[] p0genotype, int[] p1genotype, int [] posGenotype, int endPosition, String symbol) 
 	{
-		// TODO Revisar exahustivamente que realmente funcione bien
 		NonTerminalNode prod0 = new NonTerminalNode();
 		NonTerminalNode prod1 = new NonTerminalNode();
 		
@@ -583,10 +582,15 @@ public class GESchema implements JCLEC
 	 * @param depth Actual depth of the tree
 	 */
 	
-	public int grow(GEIndividual ind, String symbol, int posGenotype, int depth)
+	public int grow(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context)
 	{
-		if (isTerminal(symbol)) 
-			ind.getPhenotype().addNode(getTerminal(symbol));
+		if (isTerminal(symbol)) {
+			TerminalNode newTerm = getTerminal(symbol);
+			if(newTerm.getCode() instanceof Constant) {
+				((Constant)newTerm.getCode()).contextualize(context);
+			}
+			ind.getPhenotype().addNode(newTerm);
+		}
 		else
 		{	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
@@ -599,7 +603,7 @@ public class GESchema implements JCLEC
 			if (selectedProduction != null){
 				ind.getPhenotype().addNode(selectedProduction);
 				for(int i=0; i<selectedProduction.getProduction().length; i++)
-					posGenotype = grow(ind, selectedProduction.getProduction()[i], posGenotype, depth+1);
+					posGenotype = grow(ind, selectedProduction.getProduction()[i], posGenotype, depth+1, context);
 			}
 			else
 			{
@@ -620,10 +624,15 @@ public class GESchema implements JCLEC
 	 * @param depth Actual depth of the tree
 	 */
 	
-	public int full(GEIndividual ind, String symbol, int posGenotype, int depth) 
+	public int full(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context) 
 	{
-		if (isTerminal(symbol)) 
+		if (isTerminal(symbol)) {
+			TerminalNode newTerm = getTerminal(symbol);
+			if(newTerm.getCode() instanceof Constant) {
+				((Constant)newTerm.getCode()).contextualize(context);
+			}
 			ind.getPhenotype().addNode(getTerminal(symbol));
+		}
 		else
 		{	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
@@ -636,7 +645,7 @@ public class GESchema implements JCLEC
 			if (selectedProduction != null){
 				ind.getPhenotype().addNode(selectedProduction);
 				for(int i=0; i<selectedProduction.getProduction().length; i++)
-					posGenotype = full(ind, selectedProduction.getProduction()[i], posGenotype, depth+1);
+					posGenotype = full(ind, selectedProduction.getProduction()[i], posGenotype, depth+1, context);
 			}
 			else
 			{

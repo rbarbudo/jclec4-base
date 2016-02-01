@@ -53,8 +53,6 @@ public abstract class GESpecies implements ISpecies
 	
 	public abstract GEIndividual createIndividual(int [] genotype);
 
-	// Genotype information
-
 	/**
 	 * Informs about individual genotype length.
 	 * 
@@ -76,6 +74,12 @@ public abstract class GESpecies implements ISpecies
 	{
 		return genotypeSchema;
 	}
+
+	/**
+	 * Set the provider used in the creation of new individuals
+	 * 
+	 * @param provider Individual provider
+	 */
 	
 	public void setProvider(GECreator provider) 
 	{

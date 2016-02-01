@@ -10,6 +10,13 @@ import net.sf.jclec.ITool;
 import net.sf.jclec.ge.GEIndividual;
 import net.sf.jclec.util.opt.IOptimizer;
 
+/**
+ * One locus mutation applied to GE. In addition, this mutatot applied the 
+ * Nelder-Mead algorithm to the constants optimization
+ * 
+ * @author Rafael Barbudo Lunar
+ */
+
 public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 {
 	/////////////////////////////////////////////////////////////////
@@ -32,9 +39,8 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
 	
-	/*
-	 *  Equivalente al metodo mutateNext del original pero incluyendo además
-	 *  optimizacion con Nelder Mead
+	/**
+	 * {@inheritDoc}
 	 */
 	
 	protected void mutateNext() 
@@ -57,8 +63,13 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		sonsBuffer.add(optimizado);
 	}
 	
+	/**
+	 * Configuration method for the optimizer
+	 * 
+	 * @param settings Set of parameters needed to configure the optimizer
+	 */
+	
 	@SuppressWarnings("unchecked")
-	@Override
 	public void configure(Configuration configuration) {
 
 		try {
@@ -101,5 +112,4 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 			throw new IllegalArgumentException("This object uses a population as execution context");
 		}
 	}
-	
 }

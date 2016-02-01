@@ -10,10 +10,7 @@ import net.sf.jclec.base.AbstractMutator;
  */
 
 public abstract class GEMutator extends AbstractMutator 
-{
-	// TODO Ahora mismo esta muy enfocado a hacer las mutaciones sobre el array de enteros
-	// Susceptible de cambios cuando se implementen nuevos operadores que tengan en cuenta los fenotipos
-	
+{	
 	/////////////////////////////////////////////////////////////////
 	// --------------------------------------- Serialization constant
 	/////////////////////////////////////////////////////////////////

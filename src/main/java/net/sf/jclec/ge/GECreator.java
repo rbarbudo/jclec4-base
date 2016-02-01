@@ -99,6 +99,5 @@ public abstract class GECreator extends AbstractCreator
 		else {
 			throw new IllegalStateException("Illegal species in context");
 		}
-	}
-	
+	}	
 }

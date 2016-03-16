@@ -462,12 +462,7 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get the minimum depth size for a given symbol
-	 * 
-	 * @param prodRule for which we need to know the minimum depth size
-	 * @param visitedRules Rules which we have already visited
-	 * 
-	 * @return minimum depth size
+	 * Calculate the minimum depth size for all the productions
 	 */
 		
 	public void calculateMinDepthSize() 
@@ -475,11 +470,12 @@ public class GESchema implements JCLEC
 		List <NonTerminalNode> prodRules = new ArrayList<NonTerminalNode>(Arrays.asList(nonTerminals));
 		List <NonTerminalNode> rulesDepthOne = new ArrayList<NonTerminalNode>();
 		Set<String> symbolsVisited = new HashSet<String>();
-		Set<String> auxSymbolsVisited = new HashSet<String>();
+		//Set<String> auxSymbolsVisited = new HashSet<String>();
 		boolean nonTerminalFound = false;
 		boolean isCalculable = true;
 		int actualDepth = 1;
-				
+		
+		// Get the production with 1 as the min derivation depth
 		for(NonTerminalNode prodRule: prodRules)
 		{
 			for(String symbol: prodRule.getProduction())
@@ -488,32 +484,31 @@ public class GESchema implements JCLEC
 			
 			if(nonTerminalFound == false)
 			{
-				minDepthMap.put(prodRule, 1);
+				minDepthMap.put(prodRule, actualDepth);
 				symbolsVisited.add(prodRule.getSymbol());
 				rulesDepthOne.add(prodRule);
 			}
 			nonTerminalFound = false;
 		}
 		prodRules.removeAll(rulesDepthOne);
+		actualDepth++;
 		
-		actualDepth++;	
-		while(!prodRules.isEmpty())
-		{
-			for(NonTerminalNode prodRule: prodRules.toArray(new NonTerminalNode [prodRules.size()]))
-			{
+		// Get the depth for the other productions
+		while(!prodRules.isEmpty()) {
+			for(NonTerminalNode prodRule: prodRules.toArray(new NonTerminalNode [prodRules.size()])) {
 				for(String symbol: prodRule.getProduction())
 					if((!symbolsVisited.contains(symbol))&&(!isTerminal(symbol)))
 						isCalculable = false;
-				
-				if(isCalculable == true)
-				{
+
+				if(isCalculable == true) {
 					minDepthMap.put(prodRule, actualDepth);
-					auxSymbolsVisited.add(prodRule.getSymbol());
+					symbolsVisited.add(prodRule.getSymbol());
+					//auxSymbolsVisited.add(prodRule.getSymbol());
 					prodRules.remove(prodRule);
 				}
 				isCalculable = true;
 			}
-			symbolsVisited = auxSymbolsVisited;
+			//symbolsVisited = auxSymbolsVisited;
 			actualDepth++;
 		}
 	}

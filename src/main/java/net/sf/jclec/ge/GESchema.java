@@ -10,7 +10,6 @@ import java.util.Set;
 import net.sf.jclec.IPopulation;
 import net.sf.jclec.JCLEC;
 import net.sf.jclec.exprtree.Constant;
-import net.sf.jclec.exprtree.IPrimitive;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.intset.IIntegerSet;
@@ -48,7 +47,7 @@ public class GESchema implements JCLEC
 	
 	protected String rootSymbol;
 	
-	/** Maximum of depth per tree */
+	/** Maximum depth tree */
 	
 	protected int maxDepthSize;
 	
@@ -72,7 +71,7 @@ public class GESchema implements JCLEC
 	
 	protected transient HashMap<String, NonTerminalNode[]> nonTerminalsMap;
 	
-	/** Minimum depth map */
+	/** Minimum depth map for each production rule */
 
 	protected transient HashMap<NonTerminalNode, Integer> minDepthMap;
 	
@@ -179,7 +178,7 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get the array of nonterminal nodes
+	 * Get the array of non-terminal nodes
 	 * 
 	 * @return nonterminal nodes
 	 */
@@ -222,8 +221,10 @@ public class GESchema implements JCLEC
 	{
 		minDepthMap = new HashMap<NonTerminalNode, Integer> ();
 		
+		// Only initialize the min-depth-map with an invalid value
 		for (NonTerminalNode nonTermSymbol : nonTerminals)
 			minDepthMap.put(nonTermSymbol, -1);
+		// Set the values
 		calculateMinDepthSize();
 	}
 	
@@ -243,7 +244,7 @@ public class GESchema implements JCLEC
 	/**
 	 * Gets the minimum depth size for a given symbol
 	 * 
-	 * @param gumbol which we need to get minimum depth size
+	 * @param symbol which we need to get minimum depth size
 	 * 
 	 * @return minimum depth size
 	 */
@@ -252,7 +253,7 @@ public class GESchema implements JCLEC
 	{
 		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
 		int minDepth = getMinDepthSize(prodRules[0]);
-		
+
 		for(NonTerminalNode prodRule: prodRules)
 			if((getMinDepthSize(prodRule) < minDepth)&&(getMinDepthSize(prodRule) != -1))
 				minDepth = getMinDepthSize(prodRule);
@@ -269,7 +270,6 @@ public class GESchema implements JCLEC
 	
 	public void setMinDepthSize(NonTerminalNode production, int minDepthSize)
 	{
-		System.out.println("he entrado");
 		minDepthMap.put(production, minDepthSize);
 	}
 	
@@ -393,8 +393,7 @@ public class GESchema implements JCLEC
 		List<Integer> possibleRules = new ArrayList<Integer>();
 		int i =0;
 				
-		for(NonTerminalNode prodRule: prodRules)
-		{
+		for(NonTerminalNode prodRule: prodRules) {
 			if(depth + getMinDepthSize(prodRule) < this.maxDepthSize)
 				possibleRules.add(i);
 			i++;
@@ -432,17 +431,13 @@ public class GESchema implements JCLEC
 	    boolean recursiveRules = false;
 		
 	    // Iterate through the different rule productions
-		for(NonTerminalNode rule : prodRules)
-		{
-			if(depth + getMinDepthSize(rule) < this.maxDepthSize)
-			{
-				if(!recursiveRules && rule.isRecursive())
-				{
+		for(NonTerminalNode rule : prodRules) {
+			if(depth + getMinDepthSize(rule) < this.maxDepthSize) {
+				if(!recursiveRules && rule.isRecursive()) {
 					recursiveRules = true;
 					possibleRules.clear();
 				}
-				if(!recursiveRules || (recursiveRules && rule.isRecursive()))
-				{
+				if(!recursiveRules || (recursiveRules && rule.isRecursive())) {
 					possibleRules.add(i);
 				}
 			}
@@ -467,30 +462,35 @@ public class GESchema implements JCLEC
 		
 	public void calculateMinDepthSize() 
 	{
+		// List with all the production rules with no depth; at the end it has to be empty
 		List <NonTerminalNode> prodRules = new ArrayList<NonTerminalNode>(Arrays.asList(nonTerminals));
+		// List with all the production rules with 1 depth
 		List <NonTerminalNode> rulesDepthOne = new ArrayList<NonTerminalNode>();
+		// Set of symbols that at least one production rule's depth has been calculated
 		Set<String> symbolsVisited = new HashSet<String>();
-		//Set<String> auxSymbolsVisited = new HashSet<String>();
+		// Actual depth (iterate)
+		int actualDepth = 1;
+		// Boolean used to control the loops
 		boolean nonTerminalFound = false;
 		boolean isCalculable = true;
-		int actualDepth = 1;
 		
-		// Get the production with 1 as the min derivation depth
-		for(NonTerminalNode prodRule: prodRules)
-		{
+		// Get the production with 1 as min derivation depth
+		for(NonTerminalNode prodRule: prodRules) {
 			for(String symbol: prodRule.getProduction())
 				if(!isTerminal(symbol))
 					nonTerminalFound = true;
 			
-			if(nonTerminalFound == false)
-			{
+			if(nonTerminalFound == false) {
 				minDepthMap.put(prodRule, actualDepth);
 				symbolsVisited.add(prodRule.getSymbol());
 				rulesDepthOne.add(prodRule);
 			}
 			nonTerminalFound = false;
 		}
+		
+		// Remove the production rules with 1 as depth size
 		prodRules.removeAll(rulesDepthOne);
+		// Increase the actual depth
 		actualDepth++;
 		
 		// Get the depth for the other productions
@@ -500,15 +500,15 @@ public class GESchema implements JCLEC
 					if((!symbolsVisited.contains(symbol))&&(!isTerminal(symbol)))
 						isCalculable = false;
 
+				// Check if we can assign the depth to the production
 				if(isCalculable == true) {
 					minDepthMap.put(prodRule, actualDepth);
 					symbolsVisited.add(prodRule.getSymbol());
-					//auxSymbolsVisited.add(prodRule.getSymbol());
 					prodRules.remove(prodRule);
 				}
 				isCalculable = true;
 			}
-			//symbolsVisited = auxSymbolsVisited;
+			// Increase the actual depth
 			actualDepth++;
 		}
 	}

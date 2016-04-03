@@ -4,7 +4,7 @@ import net.sf.jclec.IProvider;
 import net.sf.jclec.ISpecies;
 
 /**
- * Abstract implementation for IGESpecies.
+ * Abstract implementation for ISpecies.
  * 
  * @author Rafael Barbudo Lunar
  */
@@ -40,9 +40,7 @@ public abstract class GESpecies implements ISpecies
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
-	
-	// Factory method
-	
+		
 	/**
 	 * Factory method.
 	 * 
@@ -56,7 +54,7 @@ public abstract class GESpecies implements ISpecies
 	/**
 	 * Informs about individual genotype length.
 	 * 
-	 * @return getGenotypeSchema().indGenotypeSchema.length
+	 * @return Individual genotype length
 	 */
 	
 	public int getGenotypeLength()

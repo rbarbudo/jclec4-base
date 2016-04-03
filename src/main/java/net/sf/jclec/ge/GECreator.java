@@ -50,12 +50,10 @@ public abstract class GECreator extends AbstractCreator
 	
 	public boolean equals(Object other)
 	{
-		if (other instanceof GECreator){
+		if (other instanceof GECreator)
 			return true;
-		}
-		else {
+		else 
 			return false;
-		}
 	}
 	
 	/**
@@ -80,9 +78,8 @@ public abstract class GECreator extends AbstractCreator
 	{
 		int gl = schema.individualArrayGenotype.length;
 		int [] result = new int[gl];
-		for(int i=0; i<gl; i++) {
+		for(int i=0; i<gl; i++)
 			result[i] = schema.individualArrayGenotype[i].getRandom(randgen);
-		}
 		return result;
 	}
 		
@@ -99,5 +96,5 @@ public abstract class GECreator extends AbstractCreator
 		else {
 			throw new IllegalStateException("Illegal species in context");
 		}
-	}	
+	}
 }

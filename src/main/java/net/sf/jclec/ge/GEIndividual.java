@@ -42,7 +42,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	/////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Constructor that sets individual genotype
+	 * Constructor that sets only individual genotype
 	 * 
 	 * @param genotype Individual genotype
 	 */
@@ -135,7 +135,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	/**
 	 * Distance between two GEIndividual
 	 * 
-	 * @param other Individual used to obtein the distance
+	 * @param other Individual used to obtain the distance
 	 */
 	
 	public double distance(IIndividual other)

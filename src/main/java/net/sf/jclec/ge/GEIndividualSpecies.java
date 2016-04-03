@@ -193,8 +193,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		// Constant schema
 		IRange [] constants = new IRange[constantLength];
 		// Set constants schema components
-		for(int i=0; i<constantLength; i++)
-		{
+		for(int i=0; i<constantLength; i++) {
 			// Get component classname
 			String componentClassname = 
 					settings.getString("constant-schema.locus("+i+")[@type]");
@@ -226,14 +225,12 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		}
 		// Assign constants schema
 		setIndividualConstant(constants);
-		
 		// Genotype lenght
 		int genotypeLength = settings.getList("genotype-schema.locus[@type]").size();
 		// Genotype schema
 		IIntegerSet [] individualArray = new IIntegerSet[genotypeLength];
 		// Set genotype schema components
-		for (int i=0; i<genotypeLength; i++) 
-		{
+		for (int i=0; i<genotypeLength; i++) {
 			// Get component classname
 			String componentClassname = 
 					settings.getString("genotype-schema.locus("+i+")[@type]");
@@ -248,8 +245,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 					((IConfigure) individualArray[i]).configure
 						(settings.subset("genotype-schema.locus("+i+")"));
 				}
-			}
-			
+			}			
 			catch(ClassNotFoundException e) {
 				e.printStackTrace();
 				System.exit(0);
@@ -279,7 +275,8 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	{
 		// Performs Schema rendering
 		ToStringBuilder tsb = new ToStringBuilder(this);
-		// Append schema
+		// Append schema and provider
+		tsb.append("provider", provider);
 		tsb.append("schema", genotypeSchema);
 		// Returns rendered schema
 		return tsb.toString();
@@ -295,6 +292,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			EqualsBuilder eb = new EqualsBuilder();
 			GEIndividualSpecies iaoth = (GEIndividualSpecies) other;
 			eb.append(this.genotypeSchema, iaoth.genotypeSchema);
+			eb.append(this.provider, iaoth.provider);
 			return eb.isEquals();
 		}
 		else {

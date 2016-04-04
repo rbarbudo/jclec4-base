@@ -18,7 +18,7 @@ public abstract class GESpecies implements ISpecies
 
 	/** Genotype Schema */
 	
-	protected GESchema genotypeSchema;
+	protected GESchema schema;
 	
 	/** Individuals provider */
 	
@@ -52,6 +52,28 @@ public abstract class GESpecies implements ISpecies
 	public abstract GEIndividual createIndividual(int [] genotype);
 
 	/**
+	 * Gets the schema
+	 * 
+	 * @return This schema
+	 */
+
+	public GESchema getSchema()
+	{
+		return schema;
+	}
+
+	/**
+	 * Sets the schema
+	 * 
+	 * @param schema The new schema
+	 */
+	
+	public void setSchema(GESchema schema)
+	{
+		this.schema = schema;
+	}
+	
+	/**
 	 * Informs about individual genotype length.
 	 * 
 	 * @return Individual genotype length
@@ -59,20 +81,9 @@ public abstract class GESpecies implements ISpecies
 	
 	public int getGenotypeLength()
 	{
-		return genotypeSchema.individualArrayGenotype.length;
+		return schema.genotypeSchema.length;
 	}
-
-	/**
-	 * Get the genotype schema
-	 * 
-	 * @return This genotype schema
-	 */
-
-	public GESchema getGenotypeSchema()
-	{
-		return genotypeSchema;
-	}
-
+	
 	/**
 	 * Set the provider used in the creation of new individuals
 	 * 

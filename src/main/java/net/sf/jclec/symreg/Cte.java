@@ -1,13 +1,9 @@
-package net.sf.jclec.exprtree;
+package net.sf.jclec.symreg;
 
-import net.sf.jclec.IPopulation;
-import net.sf.jclec.ISpecies;
 import net.sf.jclec.ISystem;
-import net.sf.jclec.ITool;
+import net.sf.jclec.exprtree.IPrimitive;
 import net.sf.jclec.exprtree.fun.AbstractPrimitive;
 import net.sf.jclec.exprtree.fun.ExprTreeFunction;
-import net.sf.jclec.ge.GESpecies;
-import net.sf.jclec.util.random.IRandGen;
 import net.sf.jclec.util.range.IRange;
 
 /**
@@ -16,7 +12,7 @@ import net.sf.jclec.util.range.IRange;
  * @author Rafael Barbudo Lunar
  */
 
-public class Constant extends AbstractPrimitive implements ITool
+public class Cte extends AbstractPrimitive
 {
 	/////////////////////////////////////////////////////////////////
 	// --------------------------------------- Serialization constant
@@ -32,15 +28,11 @@ public class Constant extends AbstractPrimitive implements ITool
 	
 	/** Constant value */
 	
-	private Double value = null;
-
-	/** Random generator used in constant creation */
-	
-	protected IRandGen randgen;
+	private Double value;
 	
 	/** Constant schema */
 	
-	protected IRange schema;
+	protected IRange [] schema;
 	
 	/** Context */
 	
@@ -54,10 +46,9 @@ public class Constant extends AbstractPrimitive implements ITool
 	 * Empty constructor
 	 */
 	
-	public Constant() 
+	public Cte() 
 	{
 		super(new Class<?> [] {Double.class, Double.class}, Double.class);				
-		//setValue(schema.getRandom(randgen));
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -66,7 +57,12 @@ public class Constant extends AbstractPrimitive implements ITool
 	
 	@Override
 	protected void evaluate(ExprTreeFunction context) 
-	{
+	{	
+		System.out.println("hola");
+		schema = context.getConstantRange();
+		double value = schema[0].getRandom(context.getRandomGenerator());
+		System.out.println("value:" + value);
+		setValue(value);
 		push(context,getValue());	
 	}
 	
@@ -87,10 +83,9 @@ public class Constant extends AbstractPrimitive implements ITool
 	@Override
 	public IPrimitive copy() 
 	{
-		Constant cNew = new Constant();
+		Cte cNew = new Cte();
 		cNew.value = new Double(this.value);
 		cNew.context = this.context;
-		cNew.randgen = this.randgen;
 		cNew.schema = this.schema;
 		
 		return cNew;
@@ -99,27 +94,15 @@ public class Constant extends AbstractPrimitive implements ITool
 	@Override
 	public IPrimitive instance() 
 	{
-		Constant cNew = new Constant();
-		cNew.contextualize(context);
+		Cte cNew = new Cte();
+		cNew.context = this.context;
+		cNew.schema = this.schema;
+		
 		return cNew;
 	}
 	
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public void contextualize(ISystem context) 
-	{
-		// TODO hay que ver si el esquema es un array o no, y si este es el 
-		//      mejor lugar para establecer el valor de la constante
-		
-		ISpecies spc = ((IPopulation)context).getSpecies();
-		if(spc instanceof GESpecies) {
-			this.schema = ((GESpecies)spc).getGenotypeSchema().getIndividualConstants()[0];
-		}
-		this.randgen = context.createRandGen();
-		setValue(schema.getRandom(randgen));
 	}	
 }

@@ -76,10 +76,10 @@ public abstract class GECreator extends AbstractCreator
 	
 	protected final int [] createGenotype()
 	{
-		int gl = schema.individualArrayGenotype.length;
+		int gl = schema.genotypeSchema.length;
 		int [] result = new int[gl];
 		for(int i=0; i<gl; i++)
-			result[i] = schema.individualArrayGenotype[i].getRandom(randgen);
+			result[i] = schema.genotypeSchema[i].getRandom(randgen);
 		return result;
 	}
 		
@@ -91,7 +91,7 @@ public abstract class GECreator extends AbstractCreator
 			// Sets individual species
 			this.species = (GESpecies) spc;
 			// Sets genotype schema
-			this.schema = this.species.getGenotypeSchema();
+			this.schema = this.species.getSchema();
 		}
 		else {
 			throw new IllegalStateException("Illegal species in context");

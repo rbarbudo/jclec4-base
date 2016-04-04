@@ -9,7 +9,7 @@ import java.util.Set;
 
 import net.sf.jclec.IPopulation;
 import net.sf.jclec.JCLEC;
-import net.sf.jclec.exprtree.Constant;
+import net.sf.jclec.symreg.Cte;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.intset.IIntegerSet;
@@ -51,9 +51,9 @@ public class GESchema implements JCLEC
 	
 	protected int maxDepthSize;
 	
-	/** Individual array genotype */
+	/** Individual genotype schema */
 	
-	protected IIntegerSet [] individualArrayGenotype;
+	protected IIntegerSet [] genotypeSchema;
 	
 	/** Individual constants */
 	
@@ -104,7 +104,7 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get the maximum depth size
+	 * Gets the maximum depth size of the tree
 	 * 
 	 * @return maximum depth size
 	 */
@@ -115,7 +115,7 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Set all the terminal symbols for this grammar
+	 * Sets all the terminal symbols for this grammar
 	 * 
 	 * @param terminals Terminals set
 	 */
@@ -167,9 +167,9 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get the array of terminal nodes
+	 * Gets the terminal nodes
 	 * 
-	 * @return terminal nodes
+	 * @return terminals The terminal nodes
 	 */
 		
 	public TerminalNode[] getTerminals() 
@@ -178,9 +178,9 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get the array of non-terminal nodes
+	 * Gets the array of non-terminal nodes
 	 * 
-	 * @return nonterminal nodes
+	 * @return nonterminal The non terminal nodes
 	 */
 		
 	public NonTerminalNode[] getNonTerminals() 
@@ -208,9 +208,8 @@ public class GESchema implements JCLEC
 	protected final void setTerminalsMap() 
 	{
 		terminalsMap = new HashMap<String, TerminalNode> ();
-		for (TerminalNode termSymbol : terminals) {
+		for (TerminalNode termSymbol : terminals)
 			terminalsMap.put(termSymbol.getSymbol(), termSymbol);
-		}
 	}
 	
 	/**
@@ -220,11 +219,10 @@ public class GESchema implements JCLEC
 	protected final void setMinDepthMap() 
 	{
 		minDepthMap = new HashMap<NonTerminalNode, Integer> ();
-		
-		// Only initialize the min-depth-map with an invalid value
+		// Initialize the min-depth-map with an invalid value
 		for (NonTerminalNode nonTermSymbol : nonTerminals)
 			minDepthMap.put(nonTermSymbol, -1);
-		// Set the values
+		// Calculate the values
 		calculateMinDepthSize();
 	}
 	
@@ -251,18 +249,22 @@ public class GESchema implements JCLEC
 		
 	public int getMinDepthSize(String symbol) 
 	{
+		// Get all the production rules of the symbol
 		NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
 		int minDepth = getMinDepthSize(prodRules[0]);
-
-		for(NonTerminalNode prodRule: prodRules)
-			if((getMinDepthSize(prodRule) < minDepth)&&(getMinDepthSize(prodRule) != -1))
-				minDepth = getMinDepthSize(prodRule);
+		int actualDepth;
 		
+		// See which production has the minimun depth
+		for(NonTerminalNode prodRule: prodRules) {
+			actualDepth = getMinDepthSize(prodRule);
+			if((actualDepth < minDepth)&&(actualDepth != -1))
+				minDepth = getMinDepthSize(prodRule);
+		}
 		return minDepth;
 	}
 	
 	/**
-	 * Sets the minimum depth size for a given symbol
+	 * Sets the minimum depth size for a given production
 	 * 
 	 * @param production which we need to set minimum depth size
 	 * @param minDepthSize minimum depth
@@ -309,11 +311,11 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Get a terminal giving his name.
+	 * Gets a terminal from its symbol name.
 	 *  
 	 * @param symbol Symbol name
 	 * 
-	 * @return Desired symbol
+	 * @return The desired terminal
 	 */
 	
 	public final TerminalNode getTerminal(String symbol)
@@ -322,34 +324,34 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Sets the schema for the individual array genotype
+	 * Sets the genotype schema
 	 * 
-	 * @param individualArray Schema for the individual genotype
+	 * @param genotypeSchema Genotype schema for the individual
 	 */
 	
-	public final void setIndividualArrayGenotype(IIntegerSet[] individualArray) 
+	public final void setGenotypeSchema(IIntegerSet[] genotypeSchema) 
 	{
-		this.individualArrayGenotype = individualArray;
+		this.genotypeSchema = genotypeSchema;
 	}
 		
 	/**
-	 * Gets the schema for the individual array constants
+	 * Gets the constant schema 
 	 * 
-	 * @return constants Schema for the individual constants
+	 * @return The constant schema
 	 */
 	
-	public final IRange[] getIndividualConstants() 
+	public final IRange[] getConstantSchema() 
 	{
 		return constants;
 	}
 	
 	/**
-	 * Sets the schema for the individual array constants
+	 * Sets the constants schema 
 	 * 
-	 * @param constants Schema for the individual constants
+	 * @param constants The constants schema 
 	 */
 	
-	public final void setIndividualConstants(IRange[] constants) 
+	public final void setConstantSchema(IRange[] constants) 
 	{
 		this.constants = constants;
 	}
@@ -357,11 +359,11 @@ public class GESchema implements JCLEC
 	/**
 	 * Select a production rule for a symbol of the grammar.
 	 * 
-	 * @param symbol  Symbol to expand
+	 * @param symbol Symbol to expand
 	 * @param genotype Genotype of an individual
 	 * @param posGenotype Reading position of the genotype
 	 * 
-	 * @return A production rule for  the given symbol.
+	 * @return A production rule for the given symbol.
 	 */	
 	
 	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype)
@@ -376,14 +378,14 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Select a production rule for a symbol of the grammar.
+	 * Select a production rule for a symbol of the grammar for a grow mapping.
 	 * 
 	 * @param symbol  Symbol to expand
 	 * @param genotype Genotype of an individual
 	 * @param posGenotype Reading position of the genotype
 	 * @param depth Actual depth of the tree
 	 * 
-	 * @return A production rule for  the given symbol.
+	 * @return A production rule for the given symbol.
 	 */	
 	
 	protected NonTerminalNode selectProductionGrow(String symbol, int [] genotype, int posGenotype, int depth)
@@ -411,7 +413,7 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
-	 * Select a production rule for a symbol of the grammar.
+	 * Select a production rule for a symbol of the grammar for a full mapping.
 	 * 
 	 * @param symbol  Symbol to expand
 	 * @param genotype Genotype of an individual
@@ -571,24 +573,19 @@ public class GESchema implements JCLEC
 	/**
 	 * Map the phenotype from a given genotype using a grow technique
 	 * 
-	 * @param phenotype Phenotype of an individual
-	 * @param symbol Symbol to add
-	 * @param genotype Genotype to be mapped
-	 * @param posGenotype Reading position of the genotype
-	 * @param depth Actual depth of the tree
+	 * @param ind The individual
+	 * @param symbol The symbol we can add
+	 * @param posGenotype The reading position of the genotype
+	 * @param depth The actual depth of the genotype
+	 * @param context The system context
+	 * 
+	 * @return The actual reading position of the genotype
 	 */
 	
 	public int grow(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context)
 	{
 		if (isTerminal(symbol)) {
-			if(symbol.equals("cte")) {
-				Constant code = new Constant();
-				code.contextualize(context);
-				ind.getPhenotype().addNode(new TerminalNode(symbol,code));
-			}
-			else {
-				ind.getPhenotype().addNode(getTerminal(symbol));
-			}
+			ind.getPhenotype().addNode(getTerminal(symbol));
 		}
 		else {	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
@@ -596,7 +593,7 @@ public class GESchema implements JCLEC
 			
 			// Increment position of genotype going back if it's necessary
 			posGenotype++;
-			if(posGenotype==ind.getGenotype().length-1)
+			if(posGenotype == ind.getGenotype().length-1)
 				posGenotype = 0;
 			if (selectedProduction != null){
 				ind.getPhenotype().addNode(selectedProduction);
@@ -614,24 +611,19 @@ public class GESchema implements JCLEC
 	/**
 	 * Map the phenotype from a given genotype using a full technique
 	 * 
-	 * @param phenotype Phenotype of an individual
-	 * @param symbol Symbol to add
-	 * @param genotype Genotype to be mapped
-	 * @param posGenotype Reading position of the genotype
-	 * @param depth Actual depth of the tree
+	 * @param ind The individual
+	 * @param symbol The symbol we can add
+	 * @param posGenotype The reading position of the genotype
+	 * @param depth The actual depth of the genotype
+	 * @param context The system context
+	 * 
+	 * @return The actual reading position of the genotype
 	 */
 	
 	public int full(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context) 
 	{
 		if (isTerminal(symbol)) {
-			if(symbol.equals("cte")) {
-				Constant code = new Constant();
-				code.contextualize(context);
-				ind.getPhenotype().addNode(new TerminalNode(symbol,code));
-			}
-			else {
-				ind.getPhenotype().addNode(getTerminal(symbol));
-			}
+			ind.getPhenotype().addNode(getTerminal(symbol));
 		}
 		else {	
 			NonTerminalNode selectedProduction = new NonTerminalNode();

@@ -139,7 +139,6 @@ public class GrammarParser
 		XMLConfiguration settings = loadXMLFile(filename);
 		// Get the number of terminal symbols
 		int numberOfTerm = settings.getList("terminal.name").size();
-		// TODO Revisar si funciona cuando un terminal no tiene codigo asociado
 		for(int j=0; j<numberOfTerm; j++){
 			try {
 				String termSymbolCodeClassname = 

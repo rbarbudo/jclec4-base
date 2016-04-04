@@ -62,7 +62,7 @@ public abstract class GEMutator extends AbstractMutator
 			// Sets individual species
 			this.species = (GESpecies) spc;
 			// Sets genotype schema
-			this.schema = this.species.getGenotypeSchema();
+			this.schema = this.species.getSchema();
 		}
 		else {
 			throw new IllegalStateException("Invalid species in context");
@@ -75,12 +75,12 @@ public abstract class GEMutator extends AbstractMutator
 	
 	protected final int getMutableLocus()
 	{
-		int genotypeLength = schema.individualArrayGenotype.length;
+		int genotypeLength = schema.genotypeSchema.length;
 		int ml;
 		do {
 			ml = randgen.choose(0, genotypeLength);
 		}
-		while (schema.individualArrayGenotype[ml].size() == 1);
+		while (schema.genotypeSchema[ml].size() == 1);
 		// Return mutation point
 		return ml;
 	}
@@ -98,7 +98,7 @@ public abstract class GEMutator extends AbstractMutator
 		int newval;
 		// Choose mutated value
 		do {
-			newval= schema.individualArrayGenotype[locus].getRandom(randgen);
+			newval= schema.genotypeSchema[locus].getRandom(randgen);
 		}
 		while(chrom[locus] == newval);
 		// Assigns new value

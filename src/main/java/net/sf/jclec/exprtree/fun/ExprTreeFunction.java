@@ -6,6 +6,8 @@ import java.util.Iterator;
 import net.sf.jclec.exprtree.ExprTree;
 import net.sf.jclec.exprtree.IContext;
 import net.sf.jclec.exprtree.IPrimitive;
+import net.sf.jclec.util.random.IRandGen;
+import net.sf.jclec.util.range.IRange;
 
 /**
  * Expression tree function.
@@ -43,6 +45,14 @@ public class ExprTreeFunction implements IContext
 	
 	protected Object [] args;
 	
+	/** Random generator used in some primitives */
+	
+	protected IRandGen randgen;
+
+	/** Range for the constants */
+	
+	protected IRange [] constantRange;
+	
 	/////////////////////////////////////////////////////////////////
 	// ------------------------------------------------- Constructors
 	/////////////////////////////////////////////////////////////////
@@ -65,13 +75,24 @@ public class ExprTreeFunction implements IContext
 		super();
 		setCode(code);
 	}
+	
+	/**
+	 * Constructor that sets function code and random generator
+	 */
+	
+	public ExprTreeFunction(ExprTree code, IRandGen randgen, IRange [] range) {
+		super();
+		setCode(code);
+		setRandomGenerator(randgen);
+		setConstantRange(range);
+	}
 
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
 
 	// Getters and setters
-	
+
 	/**
 	 * Access to function code
 	 * 
@@ -94,6 +115,50 @@ public class ExprTreeFunction implements IContext
 		this.code = code;
 	}
 
+	/**
+	 * Gets the random generator
+	 * 
+	 * @return  The random generator
+	 */
+	
+	public IRandGen getRandomGenerator() 
+	{
+		return randgen;
+	}
+	
+	/**
+	 * Sets the random generator
+	 * 
+	 * @param randgen The random generator
+	 */
+	
+	public void setRandomGenerator(IRandGen randgen) 
+	{
+		this.randgen = randgen;
+	}
+
+	/**
+	 * Gets the constant range
+	 * 
+	 * @return  The constant range
+	 */
+	
+	public IRange[] getConstantRange() 
+	{
+		return constantRange;
+	}
+	
+	/**
+	 * Sets the constant range
+	 * 
+	 * @param range The constant range schema
+	 */
+	
+	public void setConstantRange(IRange[] range) 
+	{
+		this.constantRange = range;
+	}
+	
 	// Execution method
 	
 	@SuppressWarnings("unchecked")

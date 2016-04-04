@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import net.sf.jclec.IConfigure;
 import net.sf.jclec.IIndividual;
 import net.sf.jclec.ISystem;
-import net.sf.jclec.exprtree.Constant;
 import net.sf.jclec.exprtree.IPrimitive;
 import net.sf.jclec.ge.GEIndividual;
 import net.sf.jclec.ge.GESpecies;
@@ -17,6 +16,7 @@ import net.sf.jclec.util.range.IRange;
 import net.sf.jclec.util.range.Interval;
 
 import net.sf.jclec.selector.BettersSelector;
+import net.sf.jclec.symreg.Cte;
 import net.sf.jclec.syntaxtree.SyntaxTree;
 import net.sf.jclec.syntaxtree.SyntaxTreeNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
@@ -160,8 +160,8 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 				SyntaxTreeNode node = phenotype.getNode(i);
 				if(node instanceof TerminalNode) {
 					IPrimitive code = ((TerminalNode) node).getCode();
-					if(code instanceof Constant) {
-						((Constant) code).setValue(realArray[index]);
+					if(code instanceof Cte) {
+						((Cte) code).setValue(realArray[index]);
 						index++;
 					}
 				}
@@ -186,7 +186,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 				SyntaxTreeNode node = phenotype.getNode(i);
 				if(node.getSymbol().equals("cte")) {
 					TerminalNode tNode = (TerminalNode) node;
-					lReal.add(((Constant)tNode.getCode()).getValue());
+					lReal.add(((Cte)tNode.getCode()).getValue());
 				}
 			}
 			realArray = new double[lReal.size()];
@@ -242,7 +242,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			schema = ((RealArraySpecies) spc).getGenotypeSchema();
 		}
 		if(spc instanceof GESpecies) {
-			schema = ((GESpecies) spc).getGenotypeSchema().getIndividualConstants();
+			schema = ((GESpecies) spc).getSchema().getConstantSchema();
 		}
 		else {
 			throw new IllegalArgumentException("Species doesn't expected");

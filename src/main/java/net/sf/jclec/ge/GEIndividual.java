@@ -14,7 +14,6 @@ import net.sf.jclec.syntaxtree.SyntaxTree;
  * @author Rafael Barbudo Lunar
  */
 
-
 public class GEIndividual extends AbstractIndividual<int[]> implements IConstrained
 {
 	/////////////////////////////////////////////////////////////////
@@ -85,7 +84,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	/////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Getter for the individual phenotype
+	 * Gets the individual phenotype
 	 * 
 	 * @return Individual phenotype
 	 */
@@ -96,7 +95,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	}
 
 	/**
-	 * Setter for the individual phenotype
+	 * Sets the individual phenotype
 	 * 
 	 * @param phenotype The phenotype to set
 	 */
@@ -140,19 +139,8 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 	
 	public double distance(IIndividual other)
 	{
-		// TODO Cambiar por lo que corresponda (o dejar Hamming)
+		// TODO Auto-generated method stub (see if leaving Hamming)
 		return 0;
-	}
-
-	/**
-	 * Set if the individual is feasible or not
-	 * 
-	 * @param feasibility Individual feasibility
-	 */
-	
-	public void setFeasibility(boolean feasibility)
-	{
-		this.feasible = feasibility;
 	}
 	
 	/**
@@ -169,11 +157,21 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 			eb.append(fitness, iaother.fitness);
 			return eb.isEquals();
 		}
-		else {
+		else
 			return false;
-		}
 	}
 
+	/**
+	 * Sets if the individual is feasible or not based on the genotype
+	 * 
+	 * @param feasibility Individual feasibility
+	 */
+	
+	public void setFeasibility(boolean feasibility)
+	{
+		this.feasible = feasibility;
+	}
+	
 	@Override
 	public boolean isFeasible() 
 	{

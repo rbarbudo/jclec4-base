@@ -54,7 +54,7 @@ public class FLHomologousCrossover extends GERecombinator
 		int p1gl = p1genome.length;
 		
 		// Get the first point of dissimilarity of derivation
-		int cp0 = ((GEIndividualSpecies)context.getSpecies()).getGenotypeSchema()
+		int cp0 = ((GEIndividualSpecies)context.getSpecies()).getSchema()
 				.getPointOfDerivationDissimilarity(p0genome, p1genome);
 		
 		if(cp0 == -1) {

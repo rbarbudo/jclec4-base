@@ -3,6 +3,7 @@ package net.sf.jclec.algorithm;
 import java.util.List;
 
 import net.sf.jclec.ISpecies;
+import net.sf.jclec.ITool;
 import net.sf.jclec.IProvider;
 import net.sf.jclec.IEvaluator;
 import net.sf.jclec.IConfigure;
@@ -347,6 +348,9 @@ public abstract class PopulationAlgorithm extends AbstractAlgorithm implements I
 			// Configure species
 			if (evaluator instanceof IConfigure) {
 				((IConfigure) evaluator).configure(configuration.subset("evaluator"));
+			}
+			if (evaluator instanceof ITool) {
+				((ITool) evaluator).contextualize(this);
 			}
 			// Set species
 			setEvaluator(evaluator);

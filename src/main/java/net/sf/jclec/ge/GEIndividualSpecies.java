@@ -39,19 +39,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	public GEIndividualSpecies() 
 	{
 		super();
-		genotypeSchema = new GESchema();
-	}
-
-	/**
-	 * Constructor that sets genotype schema.
-	 * 
-	 * @param genotypeSchema
-	 */
-	
-	public GEIndividualSpecies(GESchema genotypeSchema) 
-	{
-		super();
-		setGenotypeSchema(genotypeSchema);	
+		schema = new GESchema();
 	}
 	
 	/////////////////////////////////////////////////////////////////
@@ -66,7 +54,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	
 	public void setRootSymbol(String rootSymbolName)
 	{
-		genotypeSchema.setRootSymbol(rootSymbolName);
+		schema.setRootSymbol(rootSymbolName);
 	}
 		
 	/**
@@ -77,7 +65,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		
 	public void setTerminals(TerminalNode [] terminals)
 	{
-		genotypeSchema.setTerminals(terminals);
+		schema.setTerminals(terminals);
 	}
 		
 	/**
@@ -88,40 +76,29 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		
 	public void setNonTerminals(NonTerminalNode [] nonTerminals)
 	{
-		genotypeSchema.setNonTerminals(nonTerminals);
+		schema.setNonTerminals(nonTerminals);
 	}
 	
 	/**
-	 * Set the individual array genotype.
+	 * Set the individual genotype schema.
 	 * 
-	 * @param individualArray Individual array schema
+	 * @param genotypeSchema Individual genotype schema
 	 */
 	
-	private void setIndividualArrayGenotype(IIntegerSet[] individualArray) 
+	private void setGenotypeSchema(IIntegerSet[] genotypeSchema) 
 	{
-		genotypeSchema.setIndividualArrayGenotype(individualArray);
-	}
-	
-	/**
-	 * Set genotype schema
-	 * 
-	 * @param genotypeSchema New genotype schema
-	 */
-	
-	public void setGenotypeSchema(GESchema genotypeSchema)
-	{
-		this.genotypeSchema = genotypeSchema;
+		schema.setGenotypeSchema(genotypeSchema);
 	}
 
 	/**
-	 * Set the individual constant array schema.
+	 * Set the individual constant schema.
 	 * 
-	 * @param constants Individual array schema
+	 * @param constants Individual constants schema
 	 */
 	
-	private void setIndividualConstant(IRange[] constants) 
+	private void setConstantSchema(IRange[] constants) 
 	{
-		genotypeSchema.setIndividualConstants(constants);
+		schema.setConstantSchema(constants);
 	}
 	
 	/////////////////////////////////////////////////////////////////
@@ -153,7 +130,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 	
 	public void setMaxDepthSize(int maxDepthSize) 
 	{
-		genotypeSchema.setMaxDepthSize(maxDepthSize);	
+		schema.setMaxDepthSize(maxDepthSize);	
 	}
 	
 	/**
@@ -195,18 +172,14 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		// Set constants schema components
 		for(int i=0; i<constantLength; i++) {
 			// Get component classname
-			String componentClassname = 
-					settings.getString("constant-schema.locus("+i+")[@type]");
+			String componentClassname = settings.getString("constant-schema.locus("+i+")[@type]");
 			try {
-				Class<?> componentClass = 
-						Class.forName(componentClassname);
+				Class<?> componentClass = Class.forName(componentClassname);
 				// Set schema component
-				constants[i] = 
-						(IRange) componentClass.newInstance();
+				constants[i] = (IRange) componentClass.newInstance();
 				// Configure component
 				if (constants[i] instanceof IConfigure) {
-					((IConfigure) constants[i]).configure
-						(settings.subset("constant-schema.locus("+i+")"));
+					((IConfigure) constants[i]).configure(settings.subset("constant-schema.locus("+i+")"));
 				}
 			}
 			
@@ -224,7 +197,8 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			}			
 		}
 		// Assign constants schema
-		setIndividualConstant(constants);
+		setConstantSchema(constants);
+		
 		// Genotype lenght
 		int genotypeLength = settings.getList("genotype-schema.locus[@type]").size();
 		// Genotype schema
@@ -232,18 +206,14 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		// Set genotype schema components
 		for (int i=0; i<genotypeLength; i++) {
 			// Get component classname
-			String componentClassname = 
-					settings.getString("genotype-schema.locus("+i+")[@type]");
+			String componentClassname = settings.getString("genotype-schema.locus("+i+")[@type]");
 			try {
-				Class<?> componentClass = 
-						Class.forName(componentClassname);
+				Class<?> componentClass = Class.forName(componentClassname);
 				// Set schema component
-				individualArray[i] = 
-						(IIntegerSet) componentClass.newInstance();
+				individualArray[i] = (IIntegerSet) componentClass.newInstance();
 				// Configure component
 				if (individualArray[i] instanceof IConfigure) {
-					((IConfigure) individualArray[i]).configure
-						(settings.subset("genotype-schema.locus("+i+")"));
+					((IConfigure) individualArray[i]).configure(settings.subset("genotype-schema.locus("+i+")"));
 				}
 			}			
 			catch(ClassNotFoundException e) {
@@ -260,7 +230,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 			}
 		}
 		// Assign genotype schema
-		setIndividualArrayGenotype(individualArray);
+		setGenotypeSchema(individualArray);
 		
 		// Set max-tree-depth
 		int maxDepthSize = settings.getInt("max-depth-size");
@@ -277,7 +247,7 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		ToStringBuilder tsb = new ToStringBuilder(this);
 		// Append schema and provider
 		tsb.append("provider", provider);
-		tsb.append("schema", genotypeSchema);
+		tsb.append("schema", schema);
 		// Returns rendered schema
 		return tsb.toString();
 	}
@@ -291,12 +261,11 @@ public class GEIndividualSpecies extends GESpecies implements IConfigure
 		if (other instanceof GEIndividualSpecies) {
 			EqualsBuilder eb = new EqualsBuilder();
 			GEIndividualSpecies iaoth = (GEIndividualSpecies) other;
-			eb.append(this.genotypeSchema, iaoth.genotypeSchema);
+			eb.append(this.schema, iaoth.schema);
 			eb.append(this.provider, iaoth.provider);
 			return eb.isEquals();
 		}
-		else {
+		else
 			return false;
-		}
 	}	
 }

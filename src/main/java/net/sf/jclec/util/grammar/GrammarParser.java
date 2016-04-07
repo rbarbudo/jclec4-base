@@ -1,12 +1,18 @@
 package net.sf.jclec.util.grammar;
 
 import java.io.FileNotFoundException;
+
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
+import net.sf.jclec.IConfigure;
 import net.sf.jclec.exprtree.IPrimitive;
+import net.sf.jclec.symreg.ISimpleSchematized;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
+import net.sf.jclec.util.random.IRandGenFactory;
+import net.sf.jclec.util.range.IRange;
 
 /**
  * This class parse a grammar file into a set of terminal and non terminal node
@@ -147,7 +153,12 @@ public class GrammarParser
 				@SuppressWarnings("unchecked")
 				Class<? extends IPrimitive> termSymbolCodeClass = 
 					(Class<? extends IPrimitive>) Class.forName(termSymbolCodeClassname);
-				terminals[j].setCode(termSymbolCodeClass.newInstance());
+				IPrimitive code = termSymbolCodeClass.newInstance();
+				
+				if(code instanceof ISimpleSchematized) {
+					((ISimpleSchematized) code).configure(settings.subset("terminal("+j+")"));
+				}	
+				terminals[j].setCode(code);
 			} 
 			catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -160,5 +171,5 @@ public class GrammarParser
 			}
 		}
 		return terminals;
-	}
+	}	
 }

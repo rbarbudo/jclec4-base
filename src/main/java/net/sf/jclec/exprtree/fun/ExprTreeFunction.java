@@ -7,7 +7,6 @@ import net.sf.jclec.exprtree.ExprTree;
 import net.sf.jclec.exprtree.IContext;
 import net.sf.jclec.exprtree.IPrimitive;
 import net.sf.jclec.util.random.IRandGen;
-import net.sf.jclec.util.range.IRange;
 
 /**
  * Expression tree function.
@@ -48,10 +47,6 @@ public class ExprTreeFunction implements IContext
 	/** Random generator used in some primitives */
 	
 	protected IRandGen randgen;
-
-	/** Range for the constants */
-	
-	protected IRange [] constantRange;
 	
 	/////////////////////////////////////////////////////////////////
 	// ------------------------------------------------- Constructors
@@ -80,11 +75,10 @@ public class ExprTreeFunction implements IContext
 	 * Constructor that sets function code and random generator
 	 */
 	
-	public ExprTreeFunction(ExprTree code, IRandGen randgen, IRange [] range) {
+	public ExprTreeFunction(ExprTree code, IRandGen randgen) {
 		super();
 		setCode(code);
 		setRandomGenerator(randgen);
-		setConstantRange(range);
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -135,28 +129,6 @@ public class ExprTreeFunction implements IContext
 	public void setRandomGenerator(IRandGen randgen) 
 	{
 		this.randgen = randgen;
-	}
-
-	/**
-	 * Gets the constant range
-	 * 
-	 * @return  The constant range
-	 */
-	
-	public IRange[] getConstantRange() 
-	{
-		return constantRange;
-	}
-	
-	/**
-	 * Sets the constant range
-	 * 
-	 * @param range The constant range schema
-	 */
-	
-	public void setConstantRange(IRange[] range) 
-	{
-		this.constantRange = range;
 	}
 	
 	// Execution method

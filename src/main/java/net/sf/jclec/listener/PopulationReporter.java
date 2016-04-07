@@ -15,7 +15,8 @@ import net.sf.jclec.AlgorithmEvent;
 import net.sf.jclec.IAlgorithmListener;
 
 import net.sf.jclec.algorithm.PopulationAlgorithm;
-
+import net.sf.jclec.exprtree.ExprTree;
+import net.sf.jclec.ge.GEIndividual;
 import net.sf.jclec.util.IndividualStatistics;
 
 import org.apache.commons.configuration.Configuration;
@@ -288,6 +289,12 @@ public class PopulationReporter implements IAlgorithmListener, IConfigure
 		// Best individual
 		IIndividual best = IndividualStatistics.bestIndividual(inhabitants, comparator);		
 		sb.append("Best individual: "+best+"\n");
+		
+		
+		ExprTree ind_expr = (((GEIndividual)best).getPhenotype().getExprTree());	
+		System.out.println(ind_expr);
+		
+		
 		// Worst individual
 		IIndividual worst = IndividualStatistics.worstIndividual(inhabitants, comparator);
 		sb.append("Worst individual: "+worst+"\n");

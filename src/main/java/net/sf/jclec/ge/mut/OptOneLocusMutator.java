@@ -63,22 +63,28 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		flip(mgenome, mp);
 		mutant.setGenotype(mgenome);
 		
-		/*SyntaxTree phenotype = mutant.getPhenotype();
+		/*
+		SyntaxTree phenotype = mutant.getPhenotype();
 		System.out.println("antes de optimizar");
 		for(int i=0; i<phenotype.size(); i++)
 			if(phenotype.getNode(i).getSymbol().equals("cte"))
-				System.out.print(((Constant)((TerminalNode)phenotype.getNode(i)).getCode()).getValue()+" ");
-		System.out.println();*/
+				System.out.print(((Cte)((TerminalNode)phenotype.getNode(i)).getCode()).getValue()+" ");
+		System.out.println();
+		System.out.println("fit:"+mutant.getFitness());
+		*/
 		
 		// Optimize individual
 		GEIndividual optimizado = (GEIndividual) optimizer.optimize(mutant);
 		
-		/*phenotype = optimizado.getPhenotype();
+		/*
+		phenotype = optimizado.getPhenotype();
 		System.out.println("despues de optimizar");
 		for(int i=0; i<phenotype.size(); i++)
 			if(phenotype.getNode(i).getSymbol().equals("cte"))
-				System.out.print(((Constant)((TerminalNode)phenotype.getNode(i)).getCode()).getValue()+" ");
-		System.out.println();*/
+				System.out.print(((Cte)((TerminalNode)phenotype.getNode(i)).getCode()).getValue()+" ");
+		System.out.println();
+		System.out.println("fit:"+optimizado.getFitness());
+		*/
 		
 		// Returns mutant
 		sonsBuffer.add(optimizado);

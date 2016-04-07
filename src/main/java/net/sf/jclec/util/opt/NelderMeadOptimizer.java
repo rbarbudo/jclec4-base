@@ -70,9 +70,13 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	
 	BettersSelector bettersSelector;
 
-	/** Genotype schema */
+	/** Genotype multi schema */
 	
-	protected IRange [] schema;
+	protected IRange [] multiSchema;
+	
+	/** Genotype simple schema */
+	
+	protected IRange simpleSchema;
 	
 	/** Specie */
 	
@@ -220,9 +224,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		setExpansionFactor(expansionFactor);
 		
 		int maxIterations = configuration.getInt("max-iterations",10);
-		setMaxIterations(maxIterations);
-		
-					
+		setMaxIterations(maxIterations);				
 	}	
 	
 	// IOptimizer interface
@@ -239,10 +241,11 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		
 		// Get context species
 		if (spc instanceof RealArraySpecies) {
-			schema = ((RealArraySpecies) spc).getGenotypeSchema();
+			multiSchema = ((RealArraySpecies) spc).getGenotypeSchema();
 		}
-		if(spc instanceof GESpecies) {
-			schema = ((GESpecies) spc).getSchema().getConstantSchema();
+		if(spc instanceof GESpecies) {	
+			Cte constant = (Cte)((GESpecies) spc).getSchema().getTerminal("cte").getCode();
+			simpleSchema = constant.getSchema();
 		}
 		else {
 			throw new IllegalArgumentException("Species doesn't expected");
@@ -286,12 +289,12 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			
 			//Check the limits of the interval
 			if(spc instanceof RealArraySpecies) {
-				a = ((Interval) schema[i]).getLeft();
-				b = ((Interval) schema[i]).getRight();
+				a = ((Interval) multiSchema[i]).getLeft();
+				b = ((Interval) multiSchema[i]).getRight();
 			}
 			if(spc instanceof GESpecies) {
-				a = ((Interval) schema[0]).getLeft();
-				b = ((Interval) schema[0]).getRight();
+				a = ((Interval) simpleSchema).getLeft();
+				b = ((Interval) simpleSchema).getRight();
 			}
 			else {
 				throw new IllegalArgumentException("Species doesn't expected");
@@ -372,12 +375,12 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			
 			//Assign new values to the solution
 			if(spc instanceof RealArraySpecies) {
-				a = ((Interval) schema[i]).getLeft();
-				b = ((Interval) schema[i]).getRight();
+				a = ((Interval) multiSchema[i]).getLeft();
+				b = ((Interval) multiSchema[i]).getRight();
 			}
 			if(spc instanceof GESpecies) {
-				a = ((Interval) schema[0]).getLeft();
-				b = ((Interval) schema[0]).getRight();
+				a = ((Interval) simpleSchema).getLeft();
+				b = ((Interval) simpleSchema).getRight();
 			}
 			else {
 				throw new IllegalArgumentException("Species doesn't expected");

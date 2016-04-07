@@ -9,11 +9,9 @@ import java.util.Set;
 
 import net.sf.jclec.IPopulation;
 import net.sf.jclec.JCLEC;
-import net.sf.jclec.symreg.Cte;
 import net.sf.jclec.syntaxtree.NonTerminalNode;
 import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.intset.IIntegerSet;
-import net.sf.jclec.util.range.IRange;
 
 /**
  * Schema for GEIndividual and its subclasses.
@@ -54,10 +52,6 @@ public class GESchema implements JCLEC
 	/** Individual genotype schema */
 	
 	protected IIntegerSet [] genotypeSchema;
-	
-	/** Individual constants */
-	
-	protected IRange [] constants;
 	
 	/////////////////////////////////////////////////////////////
 	// --------------------------------------- Internal variables
@@ -333,28 +327,6 @@ public class GESchema implements JCLEC
 	{
 		this.genotypeSchema = genotypeSchema;
 	}
-		
-	/**
-	 * Gets the constant schema 
-	 * 
-	 * @return The constant schema
-	 */
-	
-	public final IRange[] getConstantSchema() 
-	{
-		return constants;
-	}
-	
-	/**
-	 * Sets the constants schema 
-	 * 
-	 * @param constants The constants schema 
-	 */
-	
-	public final void setConstantSchema(IRange[] constants) 
-	{
-		this.constants = constants;
-	}
 	
 	/**
 	 * Select a production rule for a symbol of the grammar.
@@ -585,7 +557,7 @@ public class GESchema implements JCLEC
 	public int grow(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context)
 	{
 		if (isTerminal(symbol)) {
-			ind.getPhenotype().addNode(getTerminal(symbol));
+			ind.getPhenotype().addNode(getTerminal(symbol).instance());
 		}
 		else {	
 			NonTerminalNode selectedProduction = new NonTerminalNode();
@@ -623,7 +595,7 @@ public class GESchema implements JCLEC
 	public int full(GEIndividual ind, String symbol, int posGenotype, int depth, IPopulation context) 
 	{
 		if (isTerminal(symbol)) {
-			ind.getPhenotype().addNode(getTerminal(symbol));
+			ind.getPhenotype().addNode(getTerminal(symbol).instance());
 		}
 		else {	
 			NonTerminalNode selectedProduction = new NonTerminalNode();

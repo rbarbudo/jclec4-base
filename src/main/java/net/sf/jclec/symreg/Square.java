@@ -27,7 +27,7 @@ public class Square extends AbstractPrimitive
 		// Get arguments (in context stack)
 		Double arg1 = pop(context);
 		// Push result in context stack
-		push(context, Math.pow(arg1,3));
+		push(context, Math.pow(arg1,2));
 	}
 
 	// java.lang.Object methods
@@ -39,6 +39,6 @@ public class Square extends AbstractPrimitive
 	
 	public String toString()
 	{
-		return "Cube";
+		return "Square";
 	}	
 }

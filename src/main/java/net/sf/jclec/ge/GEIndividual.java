@@ -120,14 +120,18 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 		
 		// Copy genotype and phenotype
 		System.arraycopy(genotype, 0, gother, 0, gl);
-		pother = phenotype.copy();
+		pother = phenotype.copy();		
+		
+		GEIndividual newInd = new GEIndividual(gother, pother);
+		newInd.setFeasibility(feasible);
 		
 		// Create new individuals, then return it
 		if (fitness != null) {
-			return new GEIndividual(gother, pother, fitness.copy());			
+			newInd.setFitness(fitness.copy());
+			return newInd;			
 		}
 		else {
-			return new GEIndividual(gother, pother);			
+			return newInd;			
 		}
 	}
 	
@@ -155,6 +159,7 @@ public class GEIndividual extends AbstractIndividual<int[]> implements IConstrai
 			eb.append(genotype, iaother.genotype);
 			eb.append(phenotype, iaother.phenotype);
 			eb.append(fitness, iaother.fitness);
+			eb.append(feasible, iaother.feasible);
 			return eb.isEquals();
 		}
 		else

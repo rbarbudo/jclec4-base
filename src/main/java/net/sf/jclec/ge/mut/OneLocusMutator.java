@@ -58,7 +58,7 @@ public class OneLocusMutator extends GEMutator
 		// Flip selected point
 		flip(mgenome, mp);
 		// Returns mutant
-		sonsBuffer.add(species.createIndividual(mgenome));
+		sonsBuffer.add(species.createAndMapIndividual(mgenome));
 	}
 
 	// java.lang.Object methods

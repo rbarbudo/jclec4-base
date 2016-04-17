@@ -94,4 +94,19 @@ public abstract class GESpecies implements ISpecies
 	{
 		this.provider = provider;
 	}
+
+	/**
+	 * Given a genotype, map the phenotype and create the individual
+	 * 
+	 * @param genotype The individual genotype
+	 * 
+	 * @return The new individual
+	 */
+	
+	public GEIndividual createAndMapIndividual(int[] genotype) 
+	{	
+		GEIndividual newInd = new GEIndividual(genotype);
+		schema.fillSyntaxBranch(newInd, schema.getRootSymbol(), 0, 0);
+		return newInd;
+	}
 }

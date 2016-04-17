@@ -350,6 +350,32 @@ public class GESchema implements JCLEC
 	}
 	
 	/**
+	 * Select a production rule for a symbol of the grammar.
+	 * 
+	 * @param symbol Symbol to expand
+	 * @param genotype Genotype of an individual
+	 * @param posGenotype Reading position of the genotype
+	 * @param depth Actual depth of the phenotype
+	 * 
+	 * @return A production rule for the given symbol.
+	 */	
+	
+	protected NonTerminalNode selectProduction(String symbol, int [] genotype, int posGenotype, int depth)
+	{	
+		if(depth <= maxDepthSize) {
+			NonTerminalNode [] prodRules = nonTerminalsMap.get(symbol);
+			// Number of productions
+			int nOfProdRules = prodRules.length;
+			// Choose production based on the genotype
+			int chosen = genotype[posGenotype] % nOfProdRules;
+			// Return production chosen
+			return prodRules[chosen];
+		}
+		else
+			return null;
+	}
+	
+	/**
 	 * Select a production rule for a symbol of the grammar for a grow mapping.
 	 * 
 	 * @param symbol  Symbol to expand
@@ -617,4 +643,42 @@ public class GESchema implements JCLEC
 		}
 		return posGenotype;
 	}
+	
+	/**
+	 * Fills a syntaxtree using the symbol
+	 * 
+	 * @param ind given individual
+	 * @param symbol Symbol to add
+	 * @param genotype Genotype of an individual
+	 * @param posGenotype Reading position of the genotype
+	 * 
+	 * @return Actual position of the genotype
+	 */
+	
+	public int fillSyntaxBranch(GEIndividual ind, String symbol, int posGenotype, int depth)
+	{
+		if (isTerminal(symbol)) {
+			ind.getPhenotype().addNode(getTerminal(symbol).instance());
+		}
+		else {
+			// Select a production rule
+			NonTerminalNode selectedProduction = selectProduction(symbol, ind.getGenotype(), posGenotype, depth);
+			// Increment position of genotype going back if it's necessary
+			posGenotype++;
+			if(posGenotype==ind.getGenotype().length-1)
+				posGenotype = 0;
+			if (selectedProduction != null) {
+				// Add this node
+				ind.getPhenotype().addNode(selectedProduction);								
+				// Expand production symbols
+				for(int i=0; i<selectedProduction.getProduction().length; i++)
+					posGenotype = fillSyntaxBranch(ind, selectedProduction.getProduction()[i], posGenotype, depth+1);
+			}
+			else {
+				ind.setFeasibility(false);
+				return posGenotype;
+			}
+		}
+		return posGenotype;
+	}	
 }

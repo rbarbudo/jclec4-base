@@ -209,9 +209,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 	/**
 	 * {@inheritDoc} 
 	 */
-	
-	// TODO Revisar para ver en que momento se llama (cada cierto numero de it)
-	
+		
 	public void configure(Configuration configuration)
 	{
 		double contractionFactor = configuration.getDouble("contraction-factor",0.5);
@@ -337,19 +335,16 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		for(int i=0; i<longitud; i++)
 			valorCentroide[i] = 0.0;
 		
-		for(int j=0; j<longitud; j++)
-		{
+		for(int j=0; j<longitud; j++) {
 			for(int i=0; i<soluciones.size(); i++){
-				if(!soluciones.get(i).equals(worst))
-				{
+				if(!soluciones.get(i).equals(worst)) {
 					//valorCentroide[j] += (soluciones.get(i)).getGenotype()[j];
 					valorCentroide[j] += getRealArray(soluciones.get(i))[j];
 				}	
 			}
 		}
 		
-		for(int i=0; i<longitud; i++)
-		{	
+		for(int i=0; i<longitud; i++) {	
 			valorCentroide[i] /= longitud;
 		}
 		
@@ -433,8 +428,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			
 			double [] centroideValue = new double[length];
 	
-			for(int i=0; i<length; i++)
-			{
+			for(int i=0; i<length; i++) {
 				centroideValue[i] = 0.0;
 			}
 			
@@ -447,8 +441,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 			// 1 - It is the second worst solution
 			// 2 - It is the best solution
 			
-			for(int i=0; i<maxIterations; i++)
-			{
+			for(int i=0; i<maxIterations; i++) {
 				extremeSolutions = obtainExtremeSolutions(solutions, length);
 			
 				calculateCentroide(solutions, extremeSolutions.get(0), centroideValue, length);
@@ -459,8 +452,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 				evaluator.evaluate(lreflection);
 				
 				//If the new solution is better than the best solution, Apply expansion process
-				if(evaluator.getComparator().compare(extremeSolutions.get(2).getFitness(),reflection.getFitness()) == -1)
-				{
+				if(evaluator.getComparator().compare(extremeSolutions.get(2).getFitness(),reflection.getFitness()) == -1) {
 					
 					move(extension, reflection, length, expansionFactor, centroideValue);
 					
@@ -472,12 +464,10 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 						extremeSolutions.get(0).setFitness(extension.getFitness());
 						
 					}
-					else
-					{
+					else {
 						//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
 						setRealArray(extremeSolutions.get(0), getRealArray(reflection));
-						extremeSolutions.get(0).setFitness( reflection.getFitness());
-					
+						extremeSolutions.get(0).setFitness( reflection.getFitness());	
 					}
 					
 				}
@@ -489,8 +479,7 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 					extremeSolutions.get(0).setFitness(reflection.getFitness());
 				}
 				
-				else
-				{
+				else {
 					//If the new solution is better than the worst solution, add the new solution
 					if(evaluator.getComparator().compare(reflection.getFitness(),extremeSolutions.get(0).getFitness()) == 1){
 						//extremeSolutions.get(0).setGenotype( reflection.getGenotype());
@@ -498,15 +487,13 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 						extremeSolutions.get(0).setFitness( reflection.getFitness());
 					
 					}
-					else
-					{
+					else {
 						//Apply contraction process
 						move(contraction, extremeSolutions.get(0), length, contractionFactor, centroideValue);
 						evaluator.evaluate(lcontraction);
 					
 						//If the new solution is better than the worst solution, add the new solution 
-						if(evaluator.getComparator().compare(contraction.getFitness(),extremeSolutions.get(0).getFitness()) == 1)
-						{
+						if(evaluator.getComparator().compare(contraction.getFitness(),extremeSolutions.get(0).getFitness()) == 1) {
 							//extremeSolutions.get(0).setGenotype( contraction.getGenotype());
 							setRealArray(extremeSolutions.get(0), getRealArray(contraction));
 							extremeSolutions.get(0).setFitness( contraction.getFitness());
@@ -540,4 +527,3 @@ public class NelderMeadOptimizer extends AbstractOptimizer implements IConfigure
 		}
 	}	
 }
-

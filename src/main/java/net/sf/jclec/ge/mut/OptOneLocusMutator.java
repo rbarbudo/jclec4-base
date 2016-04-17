@@ -8,10 +8,6 @@ import net.sf.jclec.IPopulation;
 import net.sf.jclec.ISystem;
 import net.sf.jclec.ITool;
 import net.sf.jclec.ge.GEIndividual;
-import net.sf.jclec.symreg.Cte;
-import net.sf.jclec.syntaxtree.SyntaxTree;
-import net.sf.jclec.syntaxtree.SyntaxTreeNode;
-import net.sf.jclec.syntaxtree.TerminalNode;
 import net.sf.jclec.util.opt.IOptimizer;
 
 /**
@@ -61,8 +57,7 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		int mp = getMutableLocus();
 		// Flip selected point
 		flip(mgenome, mp);
-		mutant.setGenotype(mgenome);
-		
+				
 		/*
 		SyntaxTree phenotype = mutant.getPhenotype();
 		System.out.println("antes de optimizar");
@@ -74,7 +69,8 @@ public class OptOneLocusMutator extends OneLocusMutator implements IConfigure
 		*/
 		
 		// Optimize individual
-		GEIndividual optimizado = (GEIndividual) optimizer.optimize(mutant);
+		GEIndividual optimizado = species.createAndMapIndividual(mgenome);
+		optimizado = (GEIndividual) optimizer.optimize(optimizado);
 		
 		/*
 		phenotype = optimizado.getPhenotype();

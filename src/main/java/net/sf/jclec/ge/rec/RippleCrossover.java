@@ -68,24 +68,30 @@ public class RippleCrossover extends GERecombinator
 	{
 		// Genotype length
 		int gl = species.getGenotypeLength();
+		
 		// Parents genotypes
 		int [] p0_genome = 
 			( (GEIndividual) parentsBuffer.get(parentsCounter)).getGenotype();
 		int [] p1_genome = 
 			( (GEIndividual) parentsBuffer.get(parentsCounter+1)).getGenotype();
+		
 		// Creating sons genotypes
 		int [] s0_genome = new int[gl];
 		int [] s1_genome = new int[gl];
+		
 		// Sets a crossover point
 		int cp = randgen.choose(1, gl-1);
+		
 		// First son' genotype
 		System.arraycopy(p0_genome,  0, s0_genome,  0, cp);
 		System.arraycopy(p1_genome, cp, s0_genome, cp, gl-cp);
+		
 		// Second son' genotype
 		System.arraycopy(p1_genome,  0, s1_genome,  0, cp);
 		System.arraycopy(p0_genome, cp, s1_genome, cp, gl-cp);
+		
 		// Put sons in s
-		sonsBuffer.add(species.createIndividual(s0_genome));
-		sonsBuffer.add(species.createIndividual(s1_genome));
+		sonsBuffer.add(species.createAndMapIndividual(s0_genome));
+		sonsBuffer.add(species.createAndMapIndividual(s1_genome));
 	}
 }

@@ -25,6 +25,9 @@ public class RunExperiment
 	
 	public static void main(String[] args) 
 	{
+		long TInicio, TFin, tiempo;
+		TInicio = System.currentTimeMillis();
+		
 		if (args.length == 0) {
 			System.out.println("Usage:" + USAGE_MES);
 			System.exit(1);
@@ -44,6 +47,10 @@ public class RunExperiment
 			}
 			
 			System.out.println("Job finished");
+			
+			TFin = System.currentTimeMillis();
+			tiempo = TFin - TInicio; 
+			System.out.println("Tiempo de ejecución en milisegundos: " + tiempo);
 		}
 	}
 	

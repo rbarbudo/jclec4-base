@@ -256,4 +256,18 @@ public class SyntaxTree implements JCLEC
 			return false;
 		}
 	}
+	
+	public int nOfNodes (String symbol)
+	{
+		int count = 0;
+		
+		for(int i=0; i<this.size(); i++) {
+			//System.out.println(this.getNode(i).getSymbol());
+			if(this.getNode(i).getSymbol().equals(symbol))
+				count++;
+		}
+		//System.out.println("COUNT:"+count);
+		return count;
+	}	
+	
 }

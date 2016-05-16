@@ -27,7 +27,10 @@ public class Log extends AbstractPrimitive
 		// Get arguments (in context stack)
 		Double arg1 = pop(context);
 		// Push result in context stack
-		push(context, Math.log(Math.abs(arg1)));
+		if(arg1 == 0)
+			push(context, Math.log(0.0001));
+		else
+			push(context, Math.log(Math.abs(arg1)));
 	}
 
 	// java.lang.Object methods

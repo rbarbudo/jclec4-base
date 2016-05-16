@@ -6,7 +6,6 @@ import java.util.Iterator;
 import net.sf.jclec.exprtree.ExprTree;
 import net.sf.jclec.exprtree.IContext;
 import net.sf.jclec.exprtree.IPrimitive;
-import net.sf.jclec.util.random.IRandGen;
 
 /**
  * Expression tree function.
@@ -44,10 +43,6 @@ public class ExprTreeFunction implements IContext
 	
 	protected Object [] args;
 	
-	/** Random generator used in some primitives */
-	
-	protected IRandGen randgen;
-	
 	/////////////////////////////////////////////////////////////////
 	// ------------------------------------------------- Constructors
 	/////////////////////////////////////////////////////////////////
@@ -70,23 +65,13 @@ public class ExprTreeFunction implements IContext
 		super();
 		setCode(code);
 	}
-	
-	/**
-	 * Constructor that sets function code and random generator
-	 */
-	
-	public ExprTreeFunction(ExprTree code, IRandGen randgen) {
-		super();
-		setCode(code);
-		setRandomGenerator(randgen);
-	}
 
 	/////////////////////////////////////////////////////////////////
 	// ----------------------------------------------- Public methods
 	/////////////////////////////////////////////////////////////////
 
 	// Getters and setters
-
+	
 	/**
 	 * Access to function code
 	 * 
@@ -109,28 +94,6 @@ public class ExprTreeFunction implements IContext
 		this.code = code;
 	}
 
-	/**
-	 * Gets the random generator
-	 * 
-	 * @return  The random generator
-	 */
-	
-	public IRandGen getRandomGenerator() 
-	{
-		return randgen;
-	}
-	
-	/**
-	 * Sets the random generator
-	 * 
-	 * @param randgen The random generator
-	 */
-	
-	public void setRandomGenerator(IRandGen randgen) 
-	{
-		this.randgen = randgen;
-	}
-	
 	// Execution method
 	
 	@SuppressWarnings("unchecked")

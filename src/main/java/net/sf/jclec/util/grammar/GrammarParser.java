@@ -134,7 +134,7 @@ public class GrammarParser
 	 * Set the code to a given set of terminal nodes
 	 * 
 	 * @param filename File where the code is located
-	 * @param terminal Set of terminals whihout the code
+	 * @param terminal Set of terminals without the code
 	 * 
 	 * @return Array of terminals with the code
 	 */

@@ -59,9 +59,9 @@ public class FLHomologousCrossover extends GERecombinator
 		
 		if(cp0 == -1) {
 			// Get the first parent
-			sonsBuffer.add(species.createIndividual(p0genome));
+			sonsBuffer.add(species.createAndMapIndividual(p0genome));
 			// Get the second parent
-			sonsBuffer.add(species.createIndividual(p1genome));
+			sonsBuffer.add(species.createAndMapIndividual(p1genome));
 		}
 		else
 		{
@@ -84,8 +84,8 @@ public class FLHomologousCrossover extends GERecombinator
 			System.arraycopy(p1genome, cp1, s1genome, cp1, p1gl - cp1);
 						
 			// Add the offspring to the buffer
-			sonsBuffer.add(species.createIndividual(s0genome));
-			sonsBuffer.add(species.createIndividual(s1genome));
+			sonsBuffer.add(species.createAndMapIndividual(s0genome));
+			sonsBuffer.add(species.createAndMapIndividual(s1genome));
 		}
 	}
 	
